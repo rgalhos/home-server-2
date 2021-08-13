@@ -21,3 +21,15 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+########
+/$thumbs
+/~thumbs
+
+/dist
+
+db.db3
+
+src/react-app-env.d.ts
+
+package-lock.json
