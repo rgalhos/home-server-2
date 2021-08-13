@@ -28,8 +28,8 @@ yarn-error.log*
 
 /dist
 
+package-lock.json
+
 db.db3
 
 src/react-app-env.d.ts
-
-package-lock.json
