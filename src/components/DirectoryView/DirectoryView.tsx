@@ -121,7 +121,8 @@ class DirectoryView extends React.Component<{}, States> {
                 fileList: data,
             }, cb);
         }).catch((error) => {
-            console.error(error)
+            console.error(error);
+            
             this.setState({
                 error: true,
                 errorMessage: error.message,
@@ -141,7 +142,8 @@ class DirectoryView extends React.Component<{}, States> {
                 imageList: data,
             }, cb);
         }).catch((error) => {
-            console.error(error)
+            console.error(error);
+
             this.setState({
                 error: true,
                 errorMessage: error.message,
@@ -159,7 +161,8 @@ class DirectoryView extends React.Component<{}, States> {
         }).then(() => {
             cb();
         }).catch((error) => {
-            console.error(error)
+            console.error(error);
+
             cb()
         });
     }

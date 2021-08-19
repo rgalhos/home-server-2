@@ -4,8 +4,9 @@ import { withStyles, Theme, createStyles  } from '@material-ui/core/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Link } from "@material-ui/core";
 import DescriptionIcon from '@material-ui/icons/Description';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
-import { bytesToSizeString } from "../../../utils/utils";
-import IFileInfo from "../../../../interfaces/IFileInfo";
+import { bytesToSizeString } from "../../../../utils/utils";
+import IFileInfo from "../../../../../interfaces/IFileInfo";
+import { getFilesSorting } from "../../../../session";
 
 interface FileListTableProps {
     files: IFileInfo[]
@@ -23,15 +24,27 @@ const StyledTableRow = withStyles((theme: Theme) =>
 
 export default class FileListTable extends React.Component<FileListTableProps, {}> {
     render() {
-        let rows = this.props.files
-        // @ts-ignore
-        .sort((a, b) => {
+        var sortingFn : (a: IFileInfo, b: IFileInfo) => number = (a, b) => {
             let aName = a.name.toLowerCase();
             let bName = b.name.toLowerCase();
             if (aName > bName) return 1;
             else if (aName < bName) return -1;
             return 0;
-        })
+        };
+
+        if (getFilesSorting() === "created_asc") {
+            sortingFn = (a, b) => a.created - b.created;
+        } else if (getFilesSorting() === "created_desc") {
+            sortingFn = (a, b) => b.created - a.created;
+        } else if (getFilesSorting() === "size_asc") {
+            sortingFn = (a, b) => a.size - b.size;
+        } else if (getFilesSorting() === "size_desc") {
+            sortingFn = (a, b) => b.size - a.size;
+        }
+
+        let rows = this.props.files
+        // @ts-ignore
+        .sort(sortingFn)
         .map(file => {
             file.path = '/' + file.path;
             return file;

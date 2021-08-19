@@ -1,6 +1,6 @@
 import React from "react";
 import { Box } from "@material-ui/core";
-import FileListTable from "../FileListTable/FileListTable";
+import FileListTable from "./FileListTable/FileListTable";
 import IFileInfo from "../../../../interfaces/IFileInfo";
 
 interface FileListProps {

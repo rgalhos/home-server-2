@@ -1,5 +1,5 @@
 import React from "react";
-
+import * as session from "../../../session";
 import { Box, ImageList as ImageListBox, ImageListItem, Link } from '@material-ui/core';
 import IFileInfo from "../../../../interfaces/IFileInfo";
 
@@ -9,14 +9,28 @@ interface ImageListProps {
 };
 
 export default class ImageList extends React.Component<ImageListProps, {}> {
+    imageList: ImageListProps["imageList"];
+
     constructor(props: ImageListProps) {
         super(props);
 
-        console.dir(props.imageList)
+        this.imageList = this.props.imageList;
+
+        if (session.getImageSorting() !== "name") {
+            var sortingFn: (a: IFileInfo, b: IFileInfo) => number = (a, b) => 0;
+
+            if (session.getImageSorting() === "created_asc") {
+                sortingFn = (a, b) => a.created - b.created;
+            } else if (session.getImageSorting() === "created_desc") {
+                sortingFn = (a, b) => b.created - a.created;
+            }
+
+            this.imageList = this.imageList.sort(sortingFn);
+        }
     }
 
     render() {
-        let thumbs = this.props.imageList
+        let thumbs = this.imageList
         .map((image) => (
             <ImageListItem key={image.hash} data-hash={image.hash}>
                 <Link href={"/$preview/" + image.hash}>

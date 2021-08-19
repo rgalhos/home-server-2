@@ -4,8 +4,8 @@ import { withStyles, Theme, createStyles } from '@material-ui/core/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Link } from "@material-ui/core";
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import FolderIcon from '@material-ui/icons/Folder';
-import { bytesToSizeString } from "../../../utils/utils";
-import IFolderOverview from "../../../../interfaces/IFolderOverview";
+import { bytesToSizeString } from "../../../../utils/utils";
+import IFolderOverview from "../../../../../interfaces/IFolderOverview";
 
 interface FolderListTableProps {
     folders: IFolderOverview[]

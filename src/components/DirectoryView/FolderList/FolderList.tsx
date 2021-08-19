@@ -2,7 +2,7 @@ import React from "react";
 
 import { Box, Link } from "@material-ui/core";
 import KeyboardReturnIcon from '@material-ui/icons/KeyboardReturn';
-import FolderListTable from "../FolderListTable/FolderListTable";
+import FolderListTable from "./FolderListTable/FolderListTable";
 import IFolderOverview from "../../../../interfaces/IFolderOverview";
 
 interface FolderListProps {
