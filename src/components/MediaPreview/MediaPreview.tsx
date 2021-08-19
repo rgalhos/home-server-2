@@ -1,25 +1,13 @@
 import React from "react";
 import axios from "axios";
 
-import { withStyles, Theme, createStyles } from '@material-ui/core/styles';
-import { Box, Button, ButtonGroup, CircularProgress, Container } from "@material-ui/core";
+import * as mime from "../../utils/mimeTypes";
+import { Box, CircularProgress, Container } from "@material-ui/core";
 import { withRouter } from "react-router-dom";
-import MediaPreviewInfo, { IMediaPreviewInfo } from "../MediaPreviewInfo/MediaPreviewInfo";
+import MediaPreviewInfo, { IMediaPreviewInfo } from "./MediaPreviewInfo/MediaPreviewInfo";
+import MediaPreviewControllers from "./MediaPreviewControllers/MediaPreviewControllers";
 
 import "./MediaPreview.css";
-
-const StyledButtonGroup = withStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            display: "flex",
-            flexGrow: 1,
-            marginTop: "24px",
-            marginBottom: "24px",
-            border: "1px solid",
-            borderColor: theme.palette.primary.main,
-        },
-    }),
-)(ButtonGroup);
 
 interface MediaPreviewStates {
     fileInfo: IMediaPreviewInfo | null,
@@ -30,7 +18,6 @@ interface MediaPreviewStates {
 
 export class MediaPreview extends React.Component<any, MediaPreviewStates> {
     videoRef: React.RefObject<any>;
-    setPlaybackRate: (rate: number) => void;
 
     constructor(props: any) {
         super(props);
@@ -44,20 +31,16 @@ export class MediaPreview extends React.Component<any, MediaPreviewStates> {
             background: "#000",
         };
 
-        this.getImageDimensions = this.getImageDimensions.bind(this);
+        this.setImageDimensions = this.setImageDimensions.bind(this);
         this.setBackground = this.setBackground.bind(this);
-
         this.videoRef = React.createRef();
-        this.setPlaybackRate = function(rate) {
-            this.videoRef.current.playbackRate = rate;
-        }
     }
 
     setBackground(background: string) {
         this.setState({ background });
     }
 
-    getImageDimensions(img: any) {
+    setImageDimensions(img: any) {
         this.setState({
             imageDimensions: {
                 width: img.target.naturalWidth,
@@ -80,7 +63,6 @@ export class MediaPreview extends React.Component<any, MediaPreviewStates> {
                 fileInfo: data,
             });
         }).catch((error) => {
-            console.log(error)
             this.setState({
                 error: error.message || "Unknown Error",
             });
@@ -100,8 +82,6 @@ export class MediaPreview extends React.Component<any, MediaPreviewStates> {
 
         const info: IMediaPreviewInfo = this.state.fileInfo;
 
-        console.table(info);
-
         if (this.state.imageDimensions.width > 0 && this.state.imageDimensions.height > 0) {
             info.width = this.state.imageDimensions.width;
             info.height = this.state.imageDimensions.height;
@@ -109,9 +89,8 @@ export class MediaPreview extends React.Component<any, MediaPreviewStates> {
 
         const srcLink = "/~" + info.path;
         let media = ( <h2 style={{ textAlign: "center" }}>Format not supported</h2> );
-        let mediaControls = ( <></> );
 
-        if (imageMimeTypes.indexOf(info.mimeType as string) !== -1) {
+        if (mime.isImage(info.name)) {
             media = (
                 <Box id="image-box" style={{ background: this.state.background }}>
                     <img
@@ -121,38 +100,17 @@ export class MediaPreview extends React.Component<any, MediaPreviewStates> {
                         data-lastmodified={info.lastModified}
                         data-accesstime={info.accessTime}
                         data-created={info.created}
-                        onLoad={this.getImageDimensions}
+                        onLoad={this.setImageDimensions}
+                        ref={this.videoRef}
                     />
                 </Box>
             );
-
-            mediaControls = (
-                <Box id="media-controls">
-                    <StyledButtonGroup variant="text" color="primary" aria-label="text primary button group" id="bg-buttons-group">
-                        <Button style={{ background: "#000" }} onClick={() => this.setBackground("#000")}>&nbsp;</Button>
-                        <Button style={{ background: "#fff" }} onClick={() => this.setBackground("#fff")}>&nbsp;</Button>
-                        <Button style={{ background: "url('/transp.png') repeat" }} onClick={() => this.setBackground("url('/transp.png') repeat")}>&nbsp;</Button>
-                    </StyledButtonGroup>
-                </Box>
-            );
-        } else if (videoMimeTypes.indexOf(info.mimeType as string) !== -1) {
+        } else if (mime.isVideo(info.name)) {
             media = (
                 <Box id="image-box">
                     <video controls id="video-playback" ref={this.videoRef}>
                         <source src={srcLink} type="video/mp4" />
                     </video>
-                </Box>
-            );
-
-            mediaControls = (
-                <Box>
-                    <StyledButtonGroup variant="text" color="primary" aria-label="text primary button group" id="bg-buttons-group">
-                        <Button variant="outlined" onClick={() => this.setPlaybackRate(1)}>1x</Button>
-                        <Button variant="outlined" onClick={() => this.setPlaybackRate(1.25)}>1.25x</Button>
-                        <Button variant="outlined" onClick={() => this.setPlaybackRate(1.5)}>1.5x</Button>
-                        <Button variant="outlined" onClick={() => this.setPlaybackRate(1.75)}>1.75x</Button>
-                        <Button variant="outlined" onClick={() => this.setPlaybackRate(2)}>2x</Button>
-                    </StyledButtonGroup>
                 </Box>
             );
         }
@@ -161,7 +119,11 @@ export class MediaPreview extends React.Component<any, MediaPreviewStates> {
             <Container id="preview-image">
                 {media}
     
-                {mediaControls}
+                <MediaPreviewControllers
+                    info={this.state.fileInfo}
+                    mediaRef={() => this.videoRef}
+                    setBackground={this.setBackground}
+                />
                 
                 <MediaPreviewInfo info={info} />
             </Container>
@@ -170,22 +132,3 @@ export class MediaPreview extends React.Component<any, MediaPreviewStates> {
 }
 
 export default withRouter(MediaPreview);
-
-const imageMimeTypes = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "image/avif",
-    "image/tiff",
-    "image/gif",
-    "image/svg+xml",
-    "image/bmp"
-];
-
-const videoMimeTypes = [
-    "video/mp4",
-    "video/x-matroska",
-    "video/webm",
-    "video/quicktime",
-    "video/x-msvideo"
-];

@@ -1,5 +1,19 @@
-#preview-image {
+.media-controls {
+    display: flex;
+    flex-direction: column;
+}
 
+.media-controls .margin-5 {
+    margin: 5px 0 0 0 !important;
+}
+
+.bg-buttons-group button {
+    flex-grow: 1;
+}
+
+.full-button {
+    display: flex;
+    flex-grow: 1;
 }
 
 #image-box {
@@ -29,7 +43,11 @@ body {
 }
 
 @media only screen and (max-width: 768px) {
-    #media-preview-info-table {
-        border-radius: 0px;
+    #media-preview-info-table,
+    .media-controls div[role=group],
+    .media-controls button {
+        border-radius: 0px !important;
+        border-left: 0px !important;
+        border-right: 0px !important;
     }
 }

@@ -2,11 +2,11 @@ import React from "react";
 import axios from "axios";
 
 import { CircularProgress, Container } from "@material-ui/core";
-import FolderList from "../FolderList/FolderList";
-import FileList from "../FileList/FileList";
+import FolderList from "./FolderList/FolderList";
+import FileList from "./FileList/FileList";
 import IFileInfo from "../../../interfaces/IFileInfo";
 import IFolderOverview from "../../../interfaces/IFolderOverview";
-import ImageList from "../ImageList/ImageList";
+import ImageList from "./ImageList/ImageList";
 
 interface States {
     path: string,
@@ -85,6 +85,7 @@ class DirectoryView extends React.Component<{}, States> {
         .then(cb)
         .catch((error) => {
             console.error(error);
+
             cb();
         });
     }

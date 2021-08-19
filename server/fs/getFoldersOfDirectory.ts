@@ -27,6 +27,11 @@ export default function getFoldersOfDirectory(relativePath: string) : Promise<IF
                 promises.push(
                     getFolderOverview(path.join(relativePath, dir.name))
                     .then((folder) => {
+                        // Não mostra a pasta na listagem de diretórios
+                        if (dir.name.startsWith(process.env.PRIVATE_PATH_PREFIX as string)) {
+                            return;
+                        }
+
                         if (dir.isSymbolicLink()) {
                             folder.isSymbolicLink = true;
                         }

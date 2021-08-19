@@ -1,12 +1,11 @@
 import React from "react";
-//import { Link } from "react-router-dom";
 
 import { withStyles, Theme, createStyles  } from '@material-ui/core/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Link } from "@material-ui/core";
 import DescriptionIcon from '@material-ui/icons/Description';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
-import { bytesToSizeString } from "../../utils/utils";
-import IFileInfo from "../../../interfaces/IFileInfo";
+import { bytesToSizeString } from "../../../utils/utils";
+import IFileInfo from "../../../../interfaces/IFileInfo";
 
 interface FileListTableProps {
     files: IFileInfo[]

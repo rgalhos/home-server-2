@@ -1,8 +1,8 @@
 import React from "react";
 
 import { Box, Button, Table, TableBody, TableCell, TableContainer, TableRow, Paper } from "@material-ui/core";
-import IFileInfo from "../../../interfaces/IFileInfo";
-import { bytesToSizeString } from "../../utils/utils";
+import IFileInfo from "../../../../interfaces/IFileInfo";
+import { bytesToSizeString } from "../../../utils/utils";
 
 interface MediaPreviewInfoProps {
     info: IMediaPreviewInfo,
