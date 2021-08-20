@@ -57,16 +57,16 @@ function colorizedHash(hash: string) {
     );
 }
 
+const Item = (props: any) => (
+    <ListItem>
+        {props.avatar ? ( <ListItemAvatar><Avatar>{props.avatar}</Avatar></ListItemAvatar>) : ( <></> )}
+        <ListItemText primary={props.primary} secondary={props.secondary} />
+    </ListItem>
+);
+
 export default function MediaPreviewInfo(props: MediaPreviewInfoProps) {
     const classes = useStyles();
     const info = props.info;
-
-    const Item = (props: any) => (
-        <ListItem>
-            {props.avatar ? ( <ListItemAvatar><Avatar>{props.avatar}</Avatar></ListItemAvatar>) : ( <></> )}
-            <ListItemText primary={props.primary} secondary={props.secondary} />
-        </ListItem>
-    );
 
     let details = ( <>{bytesToSizeString(info.size)}</> )
     if (info.width && info.height) {

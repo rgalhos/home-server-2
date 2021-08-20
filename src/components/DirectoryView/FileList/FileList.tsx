@@ -2,7 +2,7 @@ import React from "react";
 
 import * as mime from "mime-types";
 import { withStyles, Theme, createStyles  } from '@material-ui/core/styles';
-import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Link } from "@material-ui/core";
+import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Link, List, ListItem, ListItemAvatar, Avatar, ListItemText } from "@material-ui/core";
 import { bytesToSizeString } from "../../../utils/utils";
 import IFileInfo from "../../../../interfaces/IFileInfo";
 import { getFilesSorting } from "../../../utils/session";
@@ -60,6 +60,13 @@ function getIcon(name: string) {
     }
 }
 
+const Item = (props: any) => (
+    <ListItem color="inherit" component={Link} href={props.href}>
+        <ListItemAvatar><Avatar>{props.avatar}</Avatar></ListItemAvatar>
+        <ListItemText primary={props.primary} secondary={props.secondary} />
+    </ListItem>
+);
+
 export default class FileList extends React.Component<FileListProps, {}> {
     render() {
         if (this.props.files.length === 0) {
@@ -90,35 +97,25 @@ export default class FileList extends React.Component<FileListProps, {}> {
         let rows = this.props.files
         // @ts-ignore
         .sort(sortingFn)
-        .map(file => {
+        .map((file) => {
             file.path = '/' + file.path;
             return file;
         })
-        .map(file => (
-            <StyledTableRow hover key={file.hash}
-                style={{ cursor: "pointer" }}
+        .map((file) => (
+            <Item
+                key={file.hash}
                 data-hash={file.hash}
-            >
-                <TableCell component="th" scope="row" style={{ display: "flex", flexDirection: "row", alignItems: "center"}}>
-                    {getIcon(file.name)}
-                    <Box>
-                        <Link href={"/$preview/" + file.hash} color="inherit" underline="none">
-                            {file.name}<br />
-                            <small>{bytesToSizeString(file.size)}</small>
-                        </Link>
-                    </Box>
-                </TableCell>
-            </StyledTableRow>
+                avatar={getIcon(file.name)}
+                primary={file.name}
+                secondary={bytesToSizeString(file.size)}
+                href={"/$preview/" + file.hash}
+            />
         ));
 
         return (
-            <TableContainer component={Paper}>
-                <Table aria-label="simple table" size="small">
-                    <TableBody>
-                        {rows}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <List dense={true}>
+                {rows}
+            </List>
         );
     }
 }
