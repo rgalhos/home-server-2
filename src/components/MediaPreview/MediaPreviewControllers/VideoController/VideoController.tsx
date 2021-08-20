@@ -1,6 +1,11 @@
-import { Box, Button } from "@material-ui/core";
+import React from "react";
+import { Box, BottomNavigation, BottomNavigationAction } from "@material-ui/core";
 import { IMediaPreviewInfo } from "../../MediaPreviewInfo/MediaPreviewInfo";
-import StyledButtonGroup from "../StyledButtonGroup";
+import GetAppIcon from '@material-ui/icons/GetApp';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import CameraEnhanceIcon from "@material-ui/icons/CameraEnhance";
+import FastForwardIcon from '@material-ui/icons/FastForward';
+import AccessTimeIcon from '@material-ui/icons/AccessTime';
 
 interface IVideoControllerProps {
     info: IMediaPreviewInfo,
@@ -9,23 +14,23 @@ interface IVideoControllerProps {
 
 
 export default function VideoController(props: IVideoControllerProps) {
+    const [playbackRate, _setPlaybackRate] = React.useState(1);
+
     function setPlaybackRate(rate: number) {
+        _setPlaybackRate(rate);
+
         if (props.mediaRef()?.current) {
             (props.mediaRef().current as HTMLVideoElement).playbackRate = rate;
         }
     }
 
     function takeVideoSnapshot() {
-        const mediaRef = props.mediaRef().current;
+        const mediaRef = props.mediaRef().current as HTMLVideoElement;
 
         const currentVideoTime = {
-            // @ts-ignore
             h: Math.trunc(mediaRef.currentTime / 3600),
-            // @ts-ignore
             m: Math.trunc((mediaRef.currentTime / 60) % 60),
-            // @ts-ignore
             s: Math.trunc(mediaRef.currentTime % 60),
-            // @ts-ignore
             ms: Math.trunc((mediaRef.currentTime % 1) * 1000),
         };
 
@@ -41,14 +46,11 @@ export default function VideoController(props: IVideoControllerProps) {
 
         const canvas = document.createElement("canvas");
         canvas.id = "snapshot_" + formatTime(currentVideoTime.h, currentVideoTime.m, currentVideoTime.s, currentVideoTime.ms, '.', '.');
-        // @ts-ignore
         canvas.width = mediaRef.videoWidth;
-        // @ts-ignore
         canvas.height = mediaRef.videoHeight;
         document.body.appendChild(canvas);
 
         const context = canvas.getContext("2d");
-        // @ts-ignore
         context?.drawImage(mediaRef, 0, 0, mediaRef.videoWidth, mediaRef.videoHeight);
 
         canvas.toBlob((blob) => {
@@ -68,19 +70,37 @@ export default function VideoController(props: IVideoControllerProps) {
         }, "image/png", 1.0);
     }
 
+    function downloadVideo() {
+        const downloadLink = document.createElement("a");
+        downloadLink.href = "/~/" + props.info.path;
+        downloadLink.download = props.info.name;
+        downloadLink.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window, }));
+        downloadLink.remove();
+    }
+
+    function handleAction(action: string) {
+        if (action === "download") {
+            downloadVideo();
+        } else if (action === "snapshot") {
+            takeVideoSnapshot();
+        }
+    }
+
     return (
         <Box className="media-controls margin-5">
-            <StyledButtonGroup variant="text" color="primary" aria-label="text primary button group" className="bg-buttons-group margin-5">
-                <Button variant="outlined" onClick={() => setPlaybackRate(1)}>1x</Button>
-                <Button variant="outlined" onClick={() => setPlaybackRate(1.25)}>1.25x</Button>
-                <Button variant="outlined" onClick={() => setPlaybackRate(1.5)}>1.5x</Button>
-                <Button variant="outlined" onClick={() => setPlaybackRate(1.75)}>1.75x</Button>
-                <Button variant="outlined" onClick={() => setPlaybackRate(2)}>2x</Button>
-            </StyledButtonGroup>
+            <BottomNavigation showLabels={true} value={playbackRate} onChange={(e, rate) => setPlaybackRate(rate)}>
+                <BottomNavigationAction label="1x" value={1} icon={<AccessTimeIcon />} />
+                <BottomNavigationAction label="1.25x" value={1.25} icon={<FastForwardIcon />} />
+                <BottomNavigationAction label="1.5x" value={1.5} icon={<FastForwardIcon />} />
+                <BottomNavigationAction label="1.75x" value={1.75} icon={<FastForwardIcon />} />
+                <BottomNavigationAction label="2x" value={2} icon={<FastForwardIcon />} />
+            </BottomNavigation>
 
-            <Button variant="outlined" color="primary" className="full-button margin-5" onClick={takeVideoSnapshot}>
-                Snapshot
-            </Button>
+            <BottomNavigation onChange={(e, action) => handleAction(action)}>
+                <BottomNavigationAction label="Download" value="download" icon={<GetAppIcon />} />
+                <BottomNavigationAction label="Snapshot" value="snapshot" icon={<CameraEnhanceIcon />} />
+                <BottomNavigationAction label="Delete" value="delete" icon={<DeleteForeverIcon />} />
+            </BottomNavigation>
         </Box>
     );
 }

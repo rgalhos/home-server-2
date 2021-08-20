@@ -1,7 +1,9 @@
 import React from "react";
-import { Box, Button } from "@material-ui/core";
+import { Box, BottomNavigation, BottomNavigationAction, Button } from "@material-ui/core";
 import { IMediaPreviewInfo } from "../../MediaPreviewInfo/MediaPreviewInfo";
 import StyledButtonGroup from "../StyledButtonGroup";
+import GetAppIcon from '@material-ui/icons/GetApp';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 
 interface IImageControllerProps {
     info: IMediaPreviewInfo,
@@ -24,9 +26,28 @@ export default function ImageController(props: IImageControllerProps) {
         );
     }
 
+    function downloadImage() {
+        const downloadLink = document.createElement("a");
+        downloadLink.href = "/~/" + props.info.path;
+        downloadLink.download = props.info.name;
+        downloadLink.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window, }));
+        downloadLink.remove();
+    }
+
+    function handleAction(action: string) {
+        if (action === "download") {
+            downloadImage();
+        }
+    }
+
     return (
         <Box className="media-controls">
             {changeBackgroundButtonGroup}
+
+            <BottomNavigation onChange={(e, action) => handleAction(action)}>
+                <BottomNavigationAction label="Download" value="download" icon={<GetAppIcon />} />
+                <BottomNavigationAction label="Delete" value="delete" icon={<DeleteForeverIcon />} />
+            </BottomNavigation>
         </Box>
     );
 }

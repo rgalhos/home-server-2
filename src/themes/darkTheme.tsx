@@ -12,7 +12,8 @@ const darkTheme = createTheme({
         },
         background: {
             //default: "rgb(21, 32, 43)",
-            default: "rgb(0, 0, 0, .88)",
+            //default: "rgb(0, 0, 0, .88)",
+            default: "#121212",
         }
     }
 });

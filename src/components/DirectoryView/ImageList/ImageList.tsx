@@ -1,5 +1,5 @@
 import React from "react";
-import * as session from "../../../session";
+import { getImageSorting } from "../../../session";
 import { Box, ImageList as ImageListBox, ImageListItem, Link } from '@material-ui/core';
 import IFileInfo from "../../../../interfaces/IFileInfo";
 
@@ -16,12 +16,14 @@ export default class ImageList extends React.Component<ImageListProps, {}> {
 
         this.imageList = this.props.imageList;
 
-        if (session.getImageSorting() !== "name") {
-            var sortingFn: (a: IFileInfo, b: IFileInfo) => number = (a, b) => 0;
+        let sorting = getImageSorting();
+        
+        if (sorting !== "name") {
+            let sortingFn: (a: IFileInfo, b: IFileInfo) => number = (a, b) => 0;
 
-            if (session.getImageSorting() === "created_asc") {
+            if (sorting === "created_asc") {
                 sortingFn = (a, b) => a.created - b.created;
-            } else if (session.getImageSorting() === "created_desc") {
+            } else if (sorting === "created_desc") {
                 sortingFn = (a, b) => b.created - a.created;
             }
 

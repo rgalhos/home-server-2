@@ -1,26 +1,24 @@
 import React from "react";
 
-import { Box, Link } from "@material-ui/core";
-import KeyboardReturnIcon from '@material-ui/icons/KeyboardReturn';
+import { Box } from "@material-ui/core";
 import FolderListTable from "./FolderListTable/FolderListTable";
 import IFolderOverview from "../../../../interfaces/IFolderOverview";
+import NavigationBreadcrumb from "../NavigationBreadcrumb/NavigationBreadcrumb";
 
 interface FolderListProps {
     path: string,
     folderList: IFolderOverview[],
     changeDirectory: (path: string) => void,
-};
+}
 
 interface FolderListStates {
     folderList: IFolderOverview[],
     error: boolean,
     errorMessage: string,
     ready: boolean,
-};
+}
 
 export default class FolderList extends React.Component<FolderListProps, FolderListStates> {
-    path: string;
-
     constructor(props: FolderListProps) {
         super(props);
 
@@ -30,30 +28,14 @@ export default class FolderList extends React.Component<FolderListProps, FolderL
             errorMessage: "",
             ready: false,
         };
-
-        this.path = this.props.path;
     }
-
-    get parentFolder() {
-        return this.props.path.substr(0, this.path.lastIndexOf('/')) || '/';
-    }
-
     render() {
         return (
             <Box className="items-box">
-                <h2>
-                    Directories of <code>{this.props.path}</code>
-                    <Link
-                        href={'#' + this.parentFolder}
-                        style={{ float: "right" }}
-                        color="inherit"
-                        underline="always"
-                        onClick={() => this.props.changeDirectory(this.parentFolder)}
-                    >
-                        Back
-                        <KeyboardReturnIcon />
-                    </Link>
-                </h2>
+                <NavigationBreadcrumb
+                    changeDirectory={this.props.changeDirectory}
+                    path={this.props.path}
+                />
 
                 <FolderListTable
                     folders={this.props.folderList}

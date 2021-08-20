@@ -24,6 +24,7 @@ const StyledTableRow = withStyles((theme: Theme) =>
 
 export default class FileListTable extends React.Component<FileListTableProps, {}> {
     render() {
+        // Sort by name
         var sortingFn : (a: IFileInfo, b: IFileInfo) => number = (a, b) => {
             let aName = a.name.toLowerCase();
             let bName = b.name.toLowerCase();
@@ -32,13 +33,15 @@ export default class FileListTable extends React.Component<FileListTableProps, {
             return 0;
         };
 
-        if (getFilesSorting() === "created_asc") {
+        let sorting = getFilesSorting();
+
+        if (sorting === "created_asc") {
             sortingFn = (a, b) => a.created - b.created;
-        } else if (getFilesSorting() === "created_desc") {
+        } else if (sorting === "created_desc") {
             sortingFn = (a, b) => b.created - a.created;
-        } else if (getFilesSorting() === "size_asc") {
+        } else if (sorting === "size_asc") {
             sortingFn = (a, b) => a.size - b.size;
-        } else if (getFilesSorting() === "size_desc") {
+        } else if (sorting === "size_desc") {
             sortingFn = (a, b) => b.size - a.size;
         }
 
