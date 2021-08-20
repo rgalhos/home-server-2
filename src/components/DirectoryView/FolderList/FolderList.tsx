@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Box } from "@material-ui/core";
-import FolderListTable from "./FolderListTable/FolderListTable";
+import FolderListTable from "./FolderListTable";
 import IFolderOverview from "../../../../interfaces/IFolderOverview";
 import NavigationBreadcrumb from "../NavigationBreadcrumb/NavigationBreadcrumb";
 

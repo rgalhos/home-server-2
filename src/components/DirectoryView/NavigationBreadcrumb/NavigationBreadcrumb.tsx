@@ -13,7 +13,7 @@ export default function NavigationBreadcrumb(props: NavigationBreadcrumbProps) {
     ));
 
     const style: React.CSSProperties = {
-        margin: "5px",
+        margin: "15px 5px 5px 25px",
         fontSize: "1rem",
         fontWeight: 400,
         lineHeight: "1.5",

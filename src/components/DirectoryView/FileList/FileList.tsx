@@ -1,8 +1,7 @@
 import React from "react";
 
 import * as mime from "mime-types";
-import { withStyles, Theme, createStyles  } from '@material-ui/core/styles';
-import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Link, List, ListItem, ListItemAvatar, Avatar, ListItemText } from "@material-ui/core";
+import { Link, List, ListItem, ListItemAvatar, Avatar, ListItemText } from "@material-ui/core";
 import { bytesToSizeString } from "../../../utils/utils";
 import IFileInfo from "../../../../interfaces/IFileInfo";
 import { getFilesSorting } from "../../../utils/session";
@@ -17,16 +16,6 @@ import * as mimeUtils from "../../../utils/mimeTypes"
 interface FileListProps {
     files: IFileInfo[],
 }
-
-const StyledTableRow = withStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            "&:nth-of-type(odd)": {
-                backgroundColor: "rgba(121, 75, 196, .3)",
-            },
-        },
-    }),
-)(TableRow);
 
 function getIcon(name: string) {
     let icons = {
