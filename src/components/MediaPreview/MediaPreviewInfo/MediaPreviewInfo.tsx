@@ -1,12 +1,10 @@
 import React from "react";
 
-import { Box, List, ListItem, ListItemAvatar, Avatar, ListItemText, Divider, ListSubheader } from "@material-ui/core";
+import { Box, List, ListItem, ListItemAvatar, Avatar, ListItemText, Divider, ListSubheader, Theme, makeStyles, createStyles } from "@material-ui/core";
 import IFileInfo from "../../../../interfaces/IFileInfo";
 import { bytesToSizeString } from "../../../utils/utils";
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
-import PhotoSizeSelectLargeIcon from '@material-ui/icons/PhotoSizeSelectLarge';
 import DeveloperModeIcon from '@material-ui/icons/DeveloperMode';
-import FolderIcon from '@material-ui/icons/Folder';
 import AddIcon from '@material-ui/icons/Add';
 import CreateIcon from '@material-ui/icons/Create';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
@@ -19,6 +17,18 @@ export interface IMediaPreviewInfo extends IFileInfo {
     width?: number,
     height?: number,
 }
+
+const useStyles = makeStyles((theme: Theme) =>
+    createStyles({
+        root: {
+            width: '100%',
+            backgroundColor: theme.palette.background.paper,
+        },
+        nested: {
+            paddingLeft: theme.spacing(4),
+        },
+    }),
+);
 
 // Ugly as fuck
 function colorizedHash(hash: string) {
@@ -48,6 +58,7 @@ function colorizedHash(hash: string) {
 }
 
 export default function MediaPreviewInfo(props: MediaPreviewInfoProps) {
+    const classes = useStyles();
     const info = props.info;
 
     const Item = (props: any) => (
@@ -64,18 +75,20 @@ export default function MediaPreviewInfo(props: MediaPreviewInfoProps) {
                 {details}
                 <span>&nbsp;&nbsp;&nbsp;&#9679;&nbsp;&nbsp;&nbsp;</span>
                 {info.width}x{info.height}
+                <span>&nbsp;&nbsp;&nbsp;&#9679;&nbsp;&nbsp;&nbsp;</span>
+                {(info.width * info.height / 1e6).toFixed(1)} MP
             </>
         );
     }
 
     return (
         <Box>
-            <List dense={true} subheader={<ListSubheader>Details</ListSubheader>}>
+            <List dense={true} subheader={<ListSubheader>Details</ListSubheader>} className={classes.root}>
                 <Item avatar={<InsertDriveFileIcon />} primary={info.name} secondary={details} />
                 <Item avatar={<DeveloperModeIcon />} primary={colorizedHash(info.hash)} />
             </List>
             <Divider />
-            <List dense={true}>
+            <List dense={true} className={classes.root}>
                 <Item avatar={<AddIcon />} primary={formatDate(+info.created)} />
                 <Item avatar={<CreateIcon />} primary={formatDate(+info.lastModified)} />
                 <Item avatar={<AccessTimeIcon />} primary={formatDate(+info.accessTime)} />

@@ -7,6 +7,8 @@ import darkTheme from "./themes/darkTheme";
 import DirectoryView from "./components/DirectoryView/DirectoryView";
 import MediaPreview from "./components/MediaPreview/MediaPreview";
 import { getUserTheme } from "./utils/session";
+import { UploadView } from "./components/UploadView/UploadView";
+import { TrashbinView } from "./components/TrashbinView/TrashbinView";
 
 const theme = {
     dark: darkTheme,
@@ -22,6 +24,8 @@ class App extends React.Component {
                 <BrowserRouter>
                     <Switch>
                         <Route path="/$preview/:hash" component={MediaPreview} />
+                        <Route path="/$upload/" component={UploadView} />
+                        <Route path="/$bin/" component={TrashbinView} />
                         <Route path="/">
                             <DirectoryView />
                         </Route>

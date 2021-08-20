@@ -1,12 +1,16 @@
 import React from "react";
-import { List, ListItem, ListItemIcon, ListItemText, Switch, SwipeableDrawer, ListItemSecondaryAction, ListSubheader } from "@material-ui/core";
+import { List, ListItem, ListItemIcon, ListItemText, Switch, SwipeableDrawer, ListItemSecondaryAction, ListSubheader, Link } from "@material-ui/core";
 import DeleteIcon from '@material-ui/icons/Delete';
 import NightsStayIcon from '@material-ui/icons/NightsStay';
 import WbSunnyIcon from '@material-ui/icons/WbSunny';
 import BackupIcon from '@material-ui/icons/Backup';
 import { getUserTheme, setUserTheme } from "../../utils/session";
 
-export default function SwipeableDrawerDirectory(props: any) {
+interface SwipeableDrawerDirectoryProps {
+    path: string,
+};
+
+export default function SwipeableDrawerDirectory(props: SwipeableDrawerDirectoryProps) {
     const [ isOpen, setOpen ] = React.useState(false);
     const [ isDarkMode, _toggleDarkMode ] = React.useState(getUserTheme() === "dark");
 
@@ -30,15 +34,17 @@ export default function SwipeableDrawerDirectory(props: any) {
     const list = (
         <div role="presentation">
             <List>
-                <ListItem button>
+                <ListItem button component={Link} color="inherit" href="/$bin">
                     <ListItemIcon><DeleteIcon /></ListItemIcon>
                     <ListItemText>Bin</ListItemText>
                 </ListItem>
-                <ListItem button>
+
+                <ListItem button component={Link} color="inherit" href={"/$upload/#" + props.path}>
                     <ListItemIcon><BackupIcon /></ListItemIcon>
                     <ListItemText>Upload</ListItemText>
                 </ListItem>
             </List>
+
             <List dense={true} subheader={<ListSubheader>Settings</ListSubheader>} style={{ width: "225px" }}>
                 <ListItem color="primary">
                     <ListItemIcon><NightsStayIcon /></ListItemIcon>
