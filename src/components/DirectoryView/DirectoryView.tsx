@@ -190,8 +190,7 @@ class DirectoryView extends React.Component<{}, States> {
                     />
 
                     <FileList
-                        path={this.state.path}
-                        fileList={this.state.fileList}
+                        files={this.state.fileList}
                     />
                 </>
             );

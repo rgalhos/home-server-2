@@ -3,6 +3,7 @@ import { IMediaPreviewInfo } from "../MediaPreviewInfo/MediaPreviewInfo";
 import * as mime from "../../../utils/mimeTypes";
 import VideoController from "./VideoController/VideoController";
 import ImageController from "./ImageController/ImageController";
+import UnsupportedFormatController from "./UnsupportedFormatController/UnsupportedFormatController";
 
 interface IMediaPreviewControllersProps {
     info: IMediaPreviewInfo,
@@ -33,6 +34,6 @@ export default function MediaPreviewControllers(props: IMediaPreviewControllersP
         )
     }
 
-    return ( <></> );
+    // else
+    return ( <UnsupportedFormatController info={props.info} /> );
 }
-

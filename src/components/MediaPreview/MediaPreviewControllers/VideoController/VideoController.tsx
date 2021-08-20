@@ -88,7 +88,7 @@ export default function VideoController(props: IVideoControllerProps) {
 
     return (
         <Box className="media-controls margin-5">
-            <BottomNavigation showLabels={true} value={playbackRate} onChange={(e, rate) => setPlaybackRate(rate)}>
+            <BottomNavigation showLabels={true} value={playbackRate} onChange={(e, rate) => setPlaybackRate(rate)} style={{ overflow: "hidden" }}>
                 <BottomNavigationAction label="1x" value={1} icon={<AccessTimeIcon />} />
                 <BottomNavigationAction label="1.25x" value={1.25} icon={<FastForwardIcon />} />
                 <BottomNavigationAction label="1.5x" value={1.5} icon={<FastForwardIcon />} />
