@@ -12,12 +12,12 @@ import "./MediaPreview.css";
 interface MediaPreviewStates {
     fileInfo: IMediaPreviewInfo | null,
     error: string,
-    imageDimensions: { width: number, height: number },
+    mediaDimensions: { width: number, height: number },
     background: string,
 };
 
 export class MediaPreview extends React.Component<any, MediaPreviewStates> {
-    videoRef: React.RefObject<any>;
+    mediaRef: React.RefObject<any>;
 
     constructor(props: any) {
         super(props);
@@ -27,26 +27,21 @@ export class MediaPreview extends React.Component<any, MediaPreviewStates> {
         this.state = {
             fileInfo: null,
             error: "",
-            imageDimensions: { width: -1, height: -1 },
+            mediaDimensions: { width: -1, height: -1 },
             background: "#000",
         };
 
-        this.setImageDimensions = this.setImageDimensions.bind(this);
+        this.setMediaDimensions = this.setMediaDimensions.bind(this);
         this.setBackground = this.setBackground.bind(this);
-        this.videoRef = React.createRef();
+        this.mediaRef = React.createRef();
     }
 
     setBackground(background: string) {
         this.setState({ background });
     }
 
-    setImageDimensions(img: any) {
-        this.setState({
-            imageDimensions: {
-                width: img.target.naturalWidth,
-                height: img.target.naturalHeight,
-            },
-        });
+    setMediaDimensions({ width, height }: { width: number, height: number }) {
+        this.setState({ mediaDimensions: { width, height } });
     }
 
     componentDidMount() {
@@ -82,9 +77,9 @@ export class MediaPreview extends React.Component<any, MediaPreviewStates> {
 
         const info: IMediaPreviewInfo = this.state.fileInfo;
 
-        if (this.state.imageDimensions.width > 0 && this.state.imageDimensions.height > 0) {
-            info.width = this.state.imageDimensions.width;
-            info.height = this.state.imageDimensions.height;
+        if (this.state.mediaDimensions.width > 0 && this.state.mediaDimensions.height > 0) {
+            info.width = this.state.mediaDimensions.width;
+            info.height = this.state.mediaDimensions.height;
         }
 
         const srcLink = "/~" + info.path;
@@ -93,22 +88,22 @@ export class MediaPreview extends React.Component<any, MediaPreviewStates> {
         if (mime.isImage(info.name)) {
             media = (
                 <Box id="image-box" style={{ background: this.state.background }}>
-                    <img
-                        src={srcLink}
-                        alt={info.name}
-                        data-hash={info.hash}
-                        data-lastmodified={info.lastModified}
-                        data-accesstime={info.accessTime}
-                        data-created={info.created}
-                        onLoad={this.setImageDimensions}
-                        ref={this.videoRef}
-                    />
+                        <img
+                            src={srcLink}
+                            alt={info.name}
+                            data-hash={info.hash}
+                            data-lastmodified={info.lastModified}
+                            data-accesstime={info.accessTime}
+                            data-created={info.created}
+                            onLoad={({ target }: { target: any}) => this.setMediaDimensions({ width: target.naturalWidth, height: target.naturalHeight })}
+                            ref={this.mediaRef}
+                        />
                 </Box>
             );
         } else if (mime.isVideo(info.name)) {
             media = (
                 <Box id="image-box">
-                    <video controls id="video-playback" ref={this.videoRef}>
+                    <video controls id="video-playback" ref={this.mediaRef} onLoadedMetadata={({ target }: { target: any}) => this.setMediaDimensions({ width: target.videoWidth, height: target.videoHeight })}>
                         <source src={srcLink} type="video/mp4" />
                     </video>
                 </Box>
@@ -121,7 +116,7 @@ export class MediaPreview extends React.Component<any, MediaPreviewStates> {
     
                 <MediaPreviewControllers
                     info={this.state.fileInfo}
-                    mediaRef={() => this.videoRef}
+                    mediaRef={() => this.mediaRef}
                     setBackground={this.setBackground}
                 />
                 

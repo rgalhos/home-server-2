@@ -2,14 +2,21 @@ import React from "react";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import { ThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import { darkTheme } from "./themes/darkTheme";
+import lightTheme from "./themes/lightTheme";
+import darkTheme from "./themes/darkTheme";
 import DirectoryView from "./components/DirectoryView/DirectoryView";
 import MediaPreview from "./components/MediaPreview/MediaPreview";
+import { getUserTheme } from "./utils/session";
+
+const theme = {
+    dark: darkTheme,
+    light: lightTheme,
+}[getUserTheme()] || darkTheme;
 
 class App extends React.Component {
     render() {
         return (
-            <ThemeProvider theme={darkTheme}>
+            <ThemeProvider theme={theme}>
                 <CssBaseline />
 
                 <BrowserRouter>

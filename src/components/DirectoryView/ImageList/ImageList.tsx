@@ -1,5 +1,5 @@
 import React from "react";
-import { getImageSorting } from "../../../session";
+import { getImageSorting } from "../../../utils/session";
 import { Box, ImageList as ImageListBox, ImageListItem, Link } from '@material-ui/core';
 import IFileInfo from "../../../../interfaces/IFileInfo";
 

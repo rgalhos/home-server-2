@@ -7,6 +7,7 @@ import FileList from "./FileList/FileList";
 import IFileInfo from "../../../interfaces/IFileInfo";
 import IFolderOverview from "../../../interfaces/IFolderOverview";
 import ImageList from "./ImageList/ImageList";
+import SwipeableDrawerDirectory from "./SwipeableDrawerDirectory";
 
 interface States {
     path: string,
@@ -178,6 +179,7 @@ class DirectoryView extends React.Component<{}, States> {
         } else {
             contents = (
                 <>
+                    <SwipeableDrawerDirectory />
                     <FolderList
                         path={this.state.path}
                         folderList={this.state.folderList}

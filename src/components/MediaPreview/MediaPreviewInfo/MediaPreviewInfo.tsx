@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper } from "@material-ui/core";
+import { Box, List, ListItem, ListItemAvatar, Avatar, ListItemText, Divider, ListSubheader } from "@material-ui/core";
 import IFileInfo from "../../../../interfaces/IFileInfo";
 import { bytesToSizeString } from "../../../utils/utils";
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
@@ -50,58 +50,36 @@ function colorizedHash(hash: string) {
 export default function MediaPreviewInfo(props: MediaPreviewInfoProps) {
     const info = props.info;
 
-    const Row = (props: any) => (
-        <TableRow>
-            <TableCell scope="row" {...props}>
-                {props.children}
-            </TableCell>
-        </TableRow>
+    const Item = (props: any) => (
+        <ListItem>
+            {props.avatar ? ( <ListItemAvatar><Avatar>{props.avatar}</Avatar></ListItemAvatar>) : ( <></> )}
+            <ListItemText primary={props.primary} secondary={props.secondary} />
+        </ListItem>
     );
 
-    let dimensions = ( <></> )
+    let details = ( <>{bytesToSizeString(info.size)}</> )
     if (info.width && info.height) {
-        dimensions = (
-            <TableRow>
-                <TableCell>
-                    <PhotoSizeSelectLargeIcon /> {info.width}x{info.height}
-                </TableCell>
-            </TableRow>
-        )
+        details = (
+            <>
+                {details}
+                <span>&nbsp;&nbsp;&nbsp;&#9679;&nbsp;&nbsp;&nbsp;</span>
+                {info.width}x{info.height}
+            </>
+        );
     }
-    
-    const tableRows = (
-        <>
-            <Row>
-                <InsertDriveFileIcon /> {info.name}
-                <br />
-                <InsertDriveFileIcon style={{ visibility: "hidden" }} /> {bytesToSizeString(info.size)}
-            </Row>
-            {dimensions}
-            <Row>
-                <FolderIcon /> {info.path}
-            </Row>
-            <Row style={{ lineHeight: "200%" }}>
-                <AddIcon /> {formatDate(+info.created)}
-                <br />
-                <CreateIcon /> {formatDate(+info.lastModified)}
-                <br />
-                <AccessTimeIcon /> {formatDate(+info.accessTime)}
-            </Row>
-            <Row>
-                <DeveloperModeIcon /> {colorizedHash(info.hash)}
-            </Row>
-        </>
-    );
 
     return (
         <Box>
-            <TableContainer component={Paper} id="media-preview-info-table">
-                <Table aria-label="simple table" size="medium">
-                    <TableBody>
-                        {tableRows}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <List dense={true} subheader={<ListSubheader>Details</ListSubheader>}>
+                <Item avatar={<InsertDriveFileIcon />} primary={info.name} secondary={details} />
+                <Item avatar={<DeveloperModeIcon />} primary={colorizedHash(info.hash)} />
+            </List>
+            <Divider />
+            <List dense={true}>
+                <Item avatar={<AddIcon />} primary={formatDate(+info.created)} />
+                <Item avatar={<CreateIcon />} primary={formatDate(+info.lastModified)} />
+                <Item avatar={<AccessTimeIcon />} primary={formatDate(+info.accessTime)} />
+            </List>
         </Box>
     );
 }

@@ -1,5 +1,6 @@
 .media-controls {
     display: flex;
+    justify-content: space-around;
     flex-direction: column;
 }
 
@@ -17,13 +18,17 @@
 }
 
 #image-box {
-    display: grid;
+    display: flex;
+    align-items: center;
     width: 100vw;
     height: 100vh;
 }
 
 #image-box img, #image-box video {
-    margin: auto;
+    top: 0;
+    position: sticky;
+    margin-left: auto;
+    margin-right: auto;
     width: auto;
     height: auto;
     max-width: 100vw;

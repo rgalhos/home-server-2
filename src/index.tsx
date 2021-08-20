@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import * as session from "./session";
+import * as session from "./utils/session";
 import App from "./App";
 import "./index.css";
 

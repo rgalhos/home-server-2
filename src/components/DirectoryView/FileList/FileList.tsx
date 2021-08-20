@@ -5,7 +5,7 @@ import { withStyles, Theme, createStyles  } from '@material-ui/core/styles';
 import { Box, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Link } from "@material-ui/core";
 import { bytesToSizeString } from "../../../utils/utils";
 import IFileInfo from "../../../../interfaces/IFileInfo";
-import { getFilesSorting } from "../../../session";
+import { getFilesSorting } from "../../../utils/session";
 import MovieCreationIcon from '@material-ui/icons/MovieCreation';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import DescriptionIcon from '@material-ui/icons/Description';
