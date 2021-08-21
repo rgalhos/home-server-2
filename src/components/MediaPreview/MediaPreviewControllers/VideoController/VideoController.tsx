@@ -6,6 +6,7 @@ import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import CameraEnhanceIcon from "@material-ui/icons/CameraEnhance";
 import FastForwardIcon from '@material-ui/icons/FastForward';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
+import { newMediaSession } from "../../../../utils/videoMediaControl";
 
 interface IVideoControllerProps {
     info: IMediaPreviewInfo,
@@ -16,6 +17,12 @@ interface IVideoControllerProps {
 export default function VideoController(props: IVideoControllerProps) {
     const [playbackRate, _setPlaybackRate] = React.useState(1);
 
+    React.useEffect(() => {
+        (props.mediaRef().current as HTMLVideoElement).addEventListener("play", () => {
+            newMediaSession(props.mediaRef(), props.info, takeVideoSnapshot);
+        }, {once: true});
+    });
+
     function setPlaybackRate(rate: number) {
         _setPlaybackRate(rate);
 
@@ -24,7 +31,40 @@ export default function VideoController(props: IVideoControllerProps) {
         }
     }
 
-    function takeVideoSnapshot() {
+    function takeVideoSnapshot(type: string, quality: number, size?: { width: number, height: number }) : Promise<string> {
+        return new Promise((resolve, reject) => {
+            const mediaRef = props.mediaRef().current as HTMLVideoElement;
+            size = size || {
+                width: mediaRef.videoWidth,
+                height: mediaRef.videoHeight,
+            };
+
+            const canvas = document.createElement("canvas");
+            canvas.id = "snapshot_" + Math.trunc(Math.random() * 1e6);
+            canvas.width = mediaRef.videoWidth;
+            canvas.height = mediaRef.videoHeight;
+            document.body.appendChild(canvas);
+
+            const context = canvas.getContext("2d");
+            context?.drawImage(mediaRef, 0, 0, size.width, size.height);
+
+            try {
+                canvas.toBlob((blob) => {
+                    canvas.remove();
+                    
+                    try {
+                        resolve(window.URL.createObjectURL(blob));
+                    } catch(e) {
+                        reject(e);
+                    }
+                }, type, quality);
+            } catch(e) {
+                reject(e);
+            }
+        });
+    }
+
+    function saveVideoSnapshot() {
         const mediaRef = props.mediaRef().current as HTMLVideoElement;
 
         const currentVideoTime = {
@@ -53,9 +93,7 @@ export default function VideoController(props: IVideoControllerProps) {
         const context = canvas.getContext("2d");
         context?.drawImage(mediaRef, 0, 0, mediaRef.videoWidth, mediaRef.videoHeight);
 
-        canvas.toBlob((blob) => {
-            const data = window.URL.createObjectURL(blob);
-
+        takeVideoSnapshot("image/png", 1.0).then((data) => {
             const downloadLink = document.createElement("a");
             downloadLink.href = data;
             downloadLink.download = props.info.name.split('.').slice(0, -1).join('.').replace(/[/\\?%*:|"<>]/g, '-') + "_" + canvas.id + ".png";
@@ -67,7 +105,7 @@ export default function VideoController(props: IVideoControllerProps) {
                 downloadLink.remove();
                 canvas.remove();
             }, 100);
-        }, "image/png", 1.0);
+        });
     }
 
     function downloadVideo() {
@@ -82,7 +120,7 @@ export default function VideoController(props: IVideoControllerProps) {
         if (action === "download") {
             downloadVideo();
         } else if (action === "snapshot") {
-            takeVideoSnapshot();
+            saveVideoSnapshot();
         }
     }
 
