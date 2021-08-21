@@ -10,3 +10,27 @@ export function bytesToSizeString(bytes: number, precision = 1) : string{
 
 	return bytes.toFixed(i === 1 ? 0 : precision) + ' ' + sizes[i];
 }
+
+export function isOnMobile() {
+	let onMobile = false;
+
+	if (navigator?.maxTouchPoints) {
+		onMobile = navigator.maxTouchPoints > 0;
+	} else if (navigator?.msMaxTouchPoints) {
+		onMobile = navigator.msMaxTouchPoints > 0;
+	} else {
+		const mq = window?.matchMedia("(pointer:coarse)");
+
+		if (mq?.media === "(pointer:coarse)") {
+			onMobile = !!mq.matches;
+		} else if (window?.orientation) {
+			onMobile = true;
+		} else {
+			const ua = navigator.userAgent;
+			onMobile = /\b(BlackBerry|webOS|iPhone|IEMobile)\b/i.test(ua) ||
+				/\b(Android|Windows Phone|iPad|iPod)\b/i.test(ua);
+		}
+	}
+
+	return onMobile;
+}

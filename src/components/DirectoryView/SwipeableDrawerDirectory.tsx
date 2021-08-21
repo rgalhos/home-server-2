@@ -5,6 +5,7 @@ import NightsStayIcon from '@material-ui/icons/NightsStay';
 import WbSunnyIcon from '@material-ui/icons/WbSunny';
 import BackupIcon from '@material-ui/icons/Backup';
 import { getUserTheme, setUserTheme } from "../../utils/session";
+import { isOnMobile } from "../../utils/utils";
 
 interface SwipeableDrawerDirectoryProps {
     path: string,
@@ -66,7 +67,14 @@ export default function SwipeableDrawerDirectory(props: SwipeableDrawerDirectory
     );
 
     return (
-        <SwipeableDrawer disableDiscovery={true} anchor="left" onClose={onClose} onOpen={onOpen} open={isOpen}>
+        <SwipeableDrawer
+            disableDiscovery={true}
+            anchor="left"
+            onClose={onClose}
+            onOpen={onOpen}
+            open={isOpen}
+            variant={isOnMobile() ? "temporary" : "permanent"}
+        >
             {list}
         </SwipeableDrawer>
     )
