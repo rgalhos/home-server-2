@@ -179,10 +179,6 @@ class DirectoryView extends React.Component<{}, States> {
         } else {
             contents = (
                 <>
-                    <SwipeableDrawerDirectory
-                        path={this.state.path}
-                    />
-                    
                     <FolderList
                         path={this.state.path}
                         folderList={this.state.folderList}
@@ -203,6 +199,10 @@ class DirectoryView extends React.Component<{}, States> {
 
         return (
             <Container id="directory-view">
+                <SwipeableDrawerDirectory
+                    path={this.state.path}
+                />
+                
                 {contents}
             </Container>
         );
