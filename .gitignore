@@ -31,5 +31,6 @@ yarn-error.log*
 package-lock.json
 
 db.db3
+.env
 
 src/react-app-env.d.ts
