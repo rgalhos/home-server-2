@@ -25,8 +25,30 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(express.static(path.join(__dirname, "../../build")));
 app.use("/~thumbs", express.static(THUMBNAIL_LOCATION));
 app.use("/~", express.static(process.env.FILESYSTEM_ROOT as string));
+
+if (process.env.NODE_ENV === "production") {
+    if (process.env.ENABLE_BASIC_AUTHENTICATION === "true") {
+        app.use((req, res, next) => {
+            const auth = { login: process.env.BASIC_AUTH_LOGIN, password: process.env.BASIC_AUTH_PASS };
+            const b64auth = (req.headers.authorization || '').split(' ')[1] || '';
+            const [login, password] = Buffer.from(b64auth, "base64").toString().split(':');
+
+            if (login === auth.login && password === auth.password) {
+                return next();
+            }
+
+            res.set("WWW-Authenticate", "Basic realm=\"401\"");
+            res.status(401).send("Authentication required");
+        });
+    }
+
+    app.get(/^\/\$(preview|upload|bin)/, (req, res) => {
+        res.sendFile(path.join(__dirname, "../../build/index.html"));
+    });
+}
 
 app.get("/api/getFolders", (req, res) => {
     let { path } = req.query;
