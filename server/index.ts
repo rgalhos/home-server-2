@@ -13,13 +13,19 @@ import directoryExists from "./fs/directoryExists";
 import normalizePath from "./fs/normalizePath";
 require("dotenv").config();
 
+const THUMBNAIL_LOCATION = path.join(__dirname, "../../", process.env.THUMBNAIL_LOCATION as string);
+
+if (!fs.existsSync(THUMBNAIL_LOCATION)) {
+    fs.mkdirSync(THUMBNAIL_LOCATION);
+}
+
 const db = new Database("./db.db3");
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/~thumbs", express.static(path.join(__dirname, "../../", process.env.THUMBNAIL_LOCATION as string)));
+app.use("/~thumbs", express.static(THUMBNAIL_LOCATION));
 app.use("/~", express.static(process.env.FILESYSTEM_ROOT as string));
 
 app.get("/api/getFolders", (req, res) => {
@@ -149,7 +155,7 @@ app.post("/api/uploadFiles", (req, res) => {
                         if (err) {
                             return reject(err);
                         }
-                        
+
                         resolve();
                     });
                 })
