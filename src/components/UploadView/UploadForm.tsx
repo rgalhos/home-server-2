@@ -121,6 +121,7 @@ export default class UploadForm extends React.Component<UploadFormProps, UploadF
                             Try again
                         </Button>
                     }>
+                        <AlertTitle>Error</AlertTitle>
                         {this.state.errorMessage}
                     </Alert>
                 );
@@ -167,7 +168,7 @@ export default class UploadForm extends React.Component<UploadFormProps, UploadF
                         color="primary"
                         variant="contained"
                         onClick={this.handleUpload}
-                        disabled={!this.state.enableUploadButton && this.state.isUploading}
+                        disabled={!this.state.enableUploadButton || this.state.isUploading}
                         startIcon={ <CloudUploadIcon /> }
                     >
                         Upload

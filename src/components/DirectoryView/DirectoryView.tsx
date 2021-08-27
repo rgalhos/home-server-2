@@ -41,6 +41,7 @@ class DirectoryView extends React.Component<{}, States> {
 
         const self = this;
         window.onpopstate = function(event) {
+            event.preventDefault();
             self.changeDirectory(window.location.hash.substr(1) || '/');
         }
     }
