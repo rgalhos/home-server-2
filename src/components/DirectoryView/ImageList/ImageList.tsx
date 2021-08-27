@@ -47,9 +47,14 @@ export default class ImageList extends React.Component<ImageListProps, {}> {
             </ImageListItem>
         ));
 
+        // Número de colunas depende do tamanho da tela
+        // Trunc(Max(vw, 1280) / 100)
+        // No mínimo 4 imagens por linha
+        const noCols = Math.max(4, Math.trunc(Math.min(window.screen.width, 1280) / 100));
+
         return (
             <Box id="image-list">
-                <ImageListBox rowHeight={100} cols={4} style={{ margin: "0px" }}>
+                <ImageListBox rowHeight={100} cols={noCols} style={{ margin: "0px" }}>
                     {thumbs}
                 </ImageListBox>
             </Box>
