@@ -25,6 +25,10 @@ export default class ImageList extends React.Component<ImageListProps, {}> {
                 sortingFn = (a, b) => a.created - b.created;
             } else if (sorting === "created_desc") {
                 sortingFn = (a, b) => b.created - a.created;
+            } else if (sorting === "modified_asc") {
+                sortingFn = (a, b) => a.lastModified - b.lastModified;
+            } else if (sorting === "modified_desc") {
+                sortingFn = (a, b) => b.lastModified - a.lastModified;
             }
 
             this.imageList = this.imageList.sort(sortingFn);

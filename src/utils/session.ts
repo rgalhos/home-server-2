@@ -5,7 +5,7 @@ const THEME_LIST = [ "dark", "light" ];
 
 const defaultConfigs = {
     theme: "dark",
-    sortImagesBy: "name",
+    sortImagesBy: "modified_desc",
     sortFilesBy: "name",
     sortDirectoriesBy: "name",
 };
@@ -29,7 +29,7 @@ export function check(s?: { prefersDarkMode?: boolean }) {
 
 export function getImageSorting() {
     let s = storage.getItem("sortImagesBy") as string;
-    let valid = [ "created_asc", "created_desc", "name" ];
+    let valid = [ "created_asc", "created_desc", "modified_asc", "modified_desc", "name" ];
     if (valid.indexOf(s) === -1) {
         storage.setItem("sortImagesBy", s = defaultConfigs.sortImagesBy);
     }
