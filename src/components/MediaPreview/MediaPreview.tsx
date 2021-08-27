@@ -69,7 +69,7 @@ export class MediaPreview extends React.Component<any, MediaPreviewStates> {
             return ( <h2> {this.state.error} </h2> )
         } else if (!this.state.fileInfo) {
             return (
-                <div style={{ textAlign: "center" }}>
+                <div style={{ position: "absolute", top: "calc(50% - 50px)", left: "calc(50% - 50px)" }}>
                     <CircularProgress size={100} />
                 </div>
             );
@@ -82,7 +82,7 @@ export class MediaPreview extends React.Component<any, MediaPreviewStates> {
             info.height = this.state.mediaDimensions.height;
         }
 
-        const srcLink = "/~" + info.path;
+        const srcLink = "/~/" + info.path;
         let media = ( <h2 style={{ textAlign: "center" }}>Format not supported</h2> );
 
         if (mime.isImage(info.name)) {

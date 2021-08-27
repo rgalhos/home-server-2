@@ -172,7 +172,7 @@ class DirectoryView extends React.Component<{}, States> {
         let contents;
         if (this.state.fileList === null || this.state.folderList === null || this.state.imageList === null) {
             contents = (
-                <div style={{ textAlign: "center" }}>
+                <div style={{ position: "absolute", top: "calc(50% - 50px)", left: "calc(50% - 50px)" }}>
                     <CircularProgress size={100} />
                 </div>
             );
