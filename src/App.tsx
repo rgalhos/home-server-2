@@ -7,7 +7,7 @@ import darkTheme from "./themes/darkTheme";
 import DirectoryView from "./components/DirectoryView/DirectoryView";
 import MediaPreview from "./components/MediaPreview/MediaPreview";
 import { getUserTheme } from "./utils/session";
-import { UploadView } from "./components/UploadView/UploadView";
+import UploadView from "./components/UploadView/UploadView";
 import { TrashbinView } from "./components/TrashbinView/TrashbinView";
 
 const theme = {

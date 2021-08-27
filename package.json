@@ -6,11 +6,13 @@
   "dependencies": {
     "@material-ui/core": "^4.12.3",
     "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.60",
     "axios": "^0.21.1",
     "base-58": "0.0.1",
     "better-sqlite3": "^7.4.3",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "formidable": "^1.2.2",
     "mime-types": "^2.1.32",
     "sharp": "^0.28.3"
   },
@@ -20,6 +22,7 @@
     "@testing-library/user-event": "^12.8.3",
     "@types/better-sqlite3": "^5.4.3",
     "@types/express": "^4.17.13",
+    "@types/formidable": "^1.2.3",
     "@types/jest": "^26.0.24",
     "@types/mime-types": "^2.1.0",
     "@types/node": "^12.20.19",
