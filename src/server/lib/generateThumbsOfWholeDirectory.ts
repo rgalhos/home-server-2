@@ -1,13 +1,11 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as mime from "mime-types";
+import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 import normalizePath from "../fs/normalizePath";
-import generateThumb, { supportedMimeTypes } from "./generateThumb";
+import generateThumb from "./generateThumb";
 import getImagesOfDirectory from "../fs/getImagesOfDirectory";
 
 export default function generateThumbsOfWholeDirectory(relativePath: string) : Promise<any> {
-    const absolutePath = normalizePath(relativePath);
-
     return new Promise((resolve, reject) => {
         getImagesOfDirectory(relativePath).then((images) => {
             let promises: Array<Promise<any>> = [];
@@ -29,24 +27,67 @@ export default function generateThumbsOfWholeDirectory(relativePath: string) : P
                 imagesWithNoThumb = imagesWithNoThumb.filter(x => x !== null);
 
                 if (imagesWithNoThumb.length === 0) {
-                    return resolve(void 0);
+                    resolve(void 0);
+
+                    return;
                 }
 
-                console.log("Generating thumbs for", imagesWithNoThumb.length, "images");
-
-                promises = [];
-
-                imagesWithNoThumb.forEach((image: { hash: string, path: string }) => {
-                    promises.push(
-                        generateThumb(normalizePath(image.path), image.hash)
-                    );
+                const thumbWorker = new Worker(__filename, {
+                    workerData: imagesWithNoThumb,
                 });
 
-                Promise.all(promises)
-                    .then(resolve)
-                    .catch(reject)
-                ;
-            });
+                thumbWorker.on("message", (message: any) => {
+                    if (!message.hasOwnProperty("success")) {
+                        console.error("Received malformed message from thumbWorker!");
+                        return void reject(new Error("Received malformed message from thumbWorker!"));
+                    }
+
+                    if (message.success) {
+                        resolve(message.value);
+                    } else {
+                        reject(message.value);
+                    }
+                });
+
+                thumbWorker.on("exit", (exitCode) => {
+                    console.info("Thumbnail worker has exited. Exit code:", exitCode);
+                });
+            }).catch(reject);
         }).catch(reject);
     });
+}
+
+if (!isMainThread) {
+    console.info("Thumbnail worker has been initialized");
+
+    (function() {
+        function sendSuccess(value: any) {
+            parentPort?.postMessage({ success: true, value });
+        }
+
+        function sendError(value: any) {
+            parentPort?.postMessage({ success: false, value });
+        }
+
+        if (!Array.isArray(workerData)) {
+            console.error("worker_generateThumbsOfWholeDirectory was called with no workerData, this should not happen!");
+            return void sendError("worker_generateThumbsOfWholeDirectory was called with no workerData, this should not happen!");
+        }
+
+        // workerData = imagesWithNoThumb
+        console.log("Generating thumbs for", workerData.length, "images");
+
+        let promises: Array<Promise<any>> = [];
+
+        workerData.forEach((image: { hash: string, path: string }) => {
+            promises.push(
+                generateThumb(normalizePath(image.path), image.hash)
+            );
+        });
+
+        Promise.all(promises)
+            .then(sendSuccess)
+            .catch(sendError)
+        ;
+    })();
 }
