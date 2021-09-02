@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Box, List, ListItem, ListItemAvatar, Avatar, ListItemText, Divider, ListSubheader, Theme, makeStyles, createStyles } from "@material-ui/core";
-import IFileInfo from "../../../../interfaces/IFileInfo";
+import IFileInfo from "../../../../common/interfaces/IFileInfo";
 import { bytesToSizeString } from "../../../utils/utils";
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import DeveloperModeIcon from '@material-ui/icons/DeveloperMode';

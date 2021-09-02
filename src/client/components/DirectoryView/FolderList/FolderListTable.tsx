@@ -3,7 +3,7 @@ import React from "react";
 import { Link, ListItem, ListItemAvatar, Avatar, ListItemText, List } from "@material-ui/core";
 import FolderIcon from '@material-ui/icons/Folder';
 import { bytesToSizeString } from "../../../utils/utils";
-import IFolderOverview from "../../../../interfaces/IFolderOverview";
+import IFolderOverview from "../../../../common/interfaces/IFolderOverview";
 
 interface FolderListTableProps {
     folders: IFolderOverview[]

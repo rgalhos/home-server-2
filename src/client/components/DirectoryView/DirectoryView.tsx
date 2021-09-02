@@ -4,8 +4,8 @@ import axios from "axios";
 import { CircularProgress, Container } from "@material-ui/core";
 import FolderList from "./FolderList/FolderList";
 import FileList from "./FileList/FileList";
-import IFileInfo from "../../../interfaces/IFileInfo";
-import IFolderOverview from "../../../interfaces/IFolderOverview";
+import IFileInfo from "../../../common/interfaces/IFileInfo";
+import IFolderOverview from "../../../common/interfaces/IFolderOverview";
 import ImageList from "./ImageList/ImageList";
 import SwipeableDrawerDirectory from "./SwipeableDrawerDirectory";
 

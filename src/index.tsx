@@ -1,22 +1,6 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import * as session from "./utils/session";
-import App from "./App";
-import "./index.css";
+// React always search for a "index.(tsx?|js)" file inside "/src"
+// ;;;;;;;;;;;;;;;;;;;;
 
-(function() {
-    Promise.resolve(true)
-        .then(session.check)
-        .then(render)
-    ;
+require("./client/index");
 
-    function render() {
-        ReactDOM.render(
-            <React.StrictMode>
-                <App />
-            </React.StrictMode>,
-            document.getElementById('root')
-        );
-    }
-})();
-
+export {};

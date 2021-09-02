@@ -1,7 +1,7 @@
 import * as path from "path";
 
 import * as mime from "mime-types";
-import IFileInfo from "../../interfaces/IFileInfo";
+import IFileInfo from "../../common/interfaces/IFileInfo";
 import Database from "../database";
 import getFileStats from "./getFileStats";
 import { supportedMimeTypes } from "../lib/generateThumb";

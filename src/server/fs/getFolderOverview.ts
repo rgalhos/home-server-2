@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import normalizePath from "./normalizePath";
-import IFolderOverview from "../../interfaces/IFolderOverview";
+import IFolderOverview from "../../common/interfaces/IFolderOverview";
 
 export default function getFolderOverview(relativePath: string) : Promise<IFolderOverview> {
     const absolutePath = normalizePath(relativePath);

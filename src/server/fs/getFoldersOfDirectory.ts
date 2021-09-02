@@ -3,7 +3,7 @@ import * as path from "path";
 
 import normalizePath from "./normalizePath";
 import getFolderOverview from "./getFolderOverview";
-import IFolderOverview from "../../interfaces/IFolderOverview";
+import IFolderOverview from "../../common/interfaces/IFolderOverview";
 
 export default function getFoldersOfDirectory(relativePath: string) : Promise<IFolderOverview[]> {
     const absolutePath = normalizePath(relativePath);

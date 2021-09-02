@@ -1,5 +1,5 @@
 import sqlite3 from "better-sqlite3";
-import IFileInfo from "../../interfaces/IFileInfo";
+import IFileInfo from "../../common/interfaces/IFileInfo";
 
 const CREATE_TABLES = `
 CREATE TABLE IF NOT EXISTS "files" (

@@ -2,7 +2,7 @@ import React from "react";
 
 import { Box } from "@material-ui/core";
 import FolderListTable from "./FolderListTable";
-import IFolderOverview from "../../../../interfaces/IFolderOverview";
+import IFolderOverview from "../../../../common/interfaces/IFolderOverview";
 import NavigationBreadcrumb from "../NavigationBreadcrumb/NavigationBreadcrumb";
 
 interface FolderListProps {

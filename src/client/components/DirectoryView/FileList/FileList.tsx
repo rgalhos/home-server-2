@@ -3,7 +3,7 @@ import React from "react";
 import * as mime from "mime-types";
 import { Link, List, ListItem, ListItemAvatar, Avatar, ListItemText } from "@material-ui/core";
 import { bytesToSizeString } from "../../../utils/utils";
-import IFileInfo from "../../../../interfaces/IFileInfo";
+import IFileInfo from "../../../../common/interfaces/IFileInfo";
 import { getFilesSorting } from "../../../utils/session";
 import MovieCreationIcon from '@material-ui/icons/MovieCreation';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
