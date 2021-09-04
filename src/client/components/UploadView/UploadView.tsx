@@ -32,19 +32,14 @@ export default class UploadView extends React.Component<any, UploadViewStates> {
 
         this.changeDirectory = this.changeDirectory.bind(this);
 
-        const self = this;
-        window.onpopstate = function(event) {
+        window.onpopstate = (event) => {
             event.preventDefault();
-            self.changeDirectory(window.location.hash.substr(1) || '/');
+            this.changeDirectory(window.location.hash.substr(1) || '/');
         }
     }
 
-    changeDirectory(path: string) {
-        path = path.replace(/\\+|\/+/g, '/') || '/';
-
-        document.title = "Upload to " + path;
-
-        this.setState({ path });
+    changeDirectory(_path: string) {
+        window.location.reload();
     }
 
     componentDidMount() {

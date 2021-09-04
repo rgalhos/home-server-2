@@ -39,10 +39,9 @@ class DirectoryView extends React.Component<{}, States> {
         this.generateThumbsForDirectory = this.generateThumbsForDirectory.bind(this);
         this.scanFiles = this.scanFiles.bind(this);
 
-        const self = this;
-        window.onpopstate = function(event) {
+        window.onpopstate = (event) => {
             event.preventDefault();
-            self.changeDirectory(window.location.hash.substr(1) || '/');
+            this.changeDirectory(window.location.hash.substr(1) || '/');
         }
     }
 
