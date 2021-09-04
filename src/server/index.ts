@@ -88,7 +88,7 @@ if (process.env.NODE_ENV === "production") {
 
     app.get(/^\/\$(preview|upload|bin)/, (req, res) => {
         logger.http(JSON.stringify(req.headers, null, 4));
-        
+
         res.sendFile(path.join(__dirname, "../../build/index.html"));
     });
 }
@@ -104,6 +104,8 @@ app.get("/api/getFolders", (req, res) => {
         res.status(200).send(folders);
     })
     .catch((error) => {
+        logger.error(error);
+        
         res.status(500).send(error);
     });
 });
@@ -119,6 +121,8 @@ app.get("/api/getFiles", (req, res) => {
         res.status(200).send(folders);
     })
     .catch((error) => {
+        logger.error(error);
+        
         res.status(500).send(error);
     });
 });
@@ -131,6 +135,8 @@ app.get("/api/getFileInfo", (req, res) => {
         res.status(200).send(info);
     })
     .catch((error) => {
+        logger.error(error);
+        
         res.status(400).send(error);
     });
 });
@@ -146,6 +152,8 @@ app.get("/api/getImages", (req, res) => {
         res.status(200).send(info);
     })
     .catch((error) => {
+        logger.error(error);
+        
         res.status(400).send(error);
     });
 });
@@ -160,6 +168,8 @@ app.get("/api/generateThumbsForDirectory", (req, res) => {
         res.status(200).end();
     })
     .catch((error) => {
+        logger.error(error);
+
         res.status(500).send(error);
     });
 });
@@ -175,6 +185,8 @@ app.get("/api/scanFiles", (req, res) => {
         res.status(200).end();
     })
     .catch((error) => {
+        logger.error(error);
+
         res.status(500).send(error);
     });
 });
@@ -191,6 +203,8 @@ app.get("/api/directoryExists", (req, res) => {
 });
 
 app.post("/api/uploadFiles", (req, res) => {
+    logger.info("Requested file upload");
+
     let { filesPath } = req.query;
 
     if (filesPath === "/") filesPath = "";
@@ -204,7 +218,6 @@ app.post("/api/uploadFiles", (req, res) => {
             return;
         }
 
-        let ok = true;
         let promises: Array<Promise<unknown>> = [];
 
         // Handles a single file upload; Ugly as hell
@@ -212,12 +225,20 @@ app.post("/api/uploadFiles", (req, res) => {
             files['fileToUpload[]'] = [ files['fileToUpload[]'] ];
         }
 
+        logger.info(`Uploading ${files['fileToUpload[]'].length} files`);
+
         // @ts-ignore
         Array.from(files['fileToUpload[]']).forEach(file => {
             promises.push(
                 new Promise<void>((resolve, reject) => {
-                    fs.rename(file.path, path.join(normalizePath(filesPath as string), '/' + file.name), (err) => {
+                    const newPath = path.join(normalizePath(filesPath as string), '/' + file.name);
+
+                    logger.debug(`Renaming ${file.path} \t -> ${newPath}`);
+
+                    fs.rename(file.path, newPath, (err) => {
                         if (err) {
+                            logger.error(err);
+
                             return reject(err);
                         }
 
@@ -229,8 +250,12 @@ app.post("/api/uploadFiles", (req, res) => {
 
         Promise.all(promises)
         .then(() => {
+            logger.info("All files have been uploaded successfully");
+
             res.status(200).send({ error: false });
         }).catch(e => {
+            logger.error("Could not upload files: " + e?.message || "Unknown error");
+
             res.status(500).send({ error: true, message: e.message });
         });
     })
