@@ -11,6 +11,7 @@ import getImagesOfDirectory from "./fs/getImagesOfDirectory";
 import insertAllFilesIntoDatabase from "./database/insertAllFilesIntoDatabase";
 import directoryExists from "./fs/directoryExists";
 import normalizePath from "./fs/normalizePath";
+import Caching from "./lib/Caching";
 require("dotenv").config();
 
 const THUMBNAIL_LOCATION = path.join(__dirname, "../../", process.env.THUMBNAIL_LOCATION as string);
@@ -19,6 +20,7 @@ if (!fs.existsSync(THUMBNAIL_LOCATION)) {
     fs.mkdirSync(THUMBNAIL_LOCATION);
 }
 
+const cache = new Caching();
 const db = new Database("./db.db3");
 const app = express();
 
@@ -26,8 +28,44 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, "../../build")));
-app.use("/~thumbs", express.static(THUMBNAIL_LOCATION));
 app.use("/~", express.static(process.env.FILESYSTEM_ROOT as string));
+
+if (process.env.caching === "true") {
+    app.use("/~thumbs/:hash", (req, res, next) => {
+        const hash = req.params.hash;
+
+        if (cache.isThumbCached(hash)) {
+            console.log(`Cache hit: We have thumb "${hash}" in memory!`);
+
+            const thumb = cache.getCachedThumb(hash) as Buffer;
+            
+            return void res.writeHead(200, {
+                "Content-Type": "image/jpeg",
+                "Content-Length": thumb.length,
+            })
+            .end(thumb);
+        } else {
+            console.log(`Cache miss: We don't have thumb "${hash}" in memory!`);
+
+            cache.storeThumb(hash, hash)
+            .then((thumb) => {
+                console.info(`Stored thumb for "${hash}"`);
+                return void res.writeHead(200, {
+                    "Content-Type": "image/jpeg",
+                    "Content-Length": thumb.length,
+                })
+                .end(thumb);
+            })
+            .catch(err => {
+                console.error("Could not get thumbnail from cache: " + (err?.message || "unknown error") + " :: Reading from filesystem...");
+
+                return void next();
+            });
+        }
+    });
+}
+
+app.use("/~thumbs", express.static(THUMBNAIL_LOCATION));
 
 if (process.env.NODE_ENV === "production") {
     if (process.env.ENABLE_BASIC_AUTHENTICATION === "true") {

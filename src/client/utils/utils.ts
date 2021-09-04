@@ -16,7 +16,10 @@ export function isOnMobile() {
 
 	if (navigator?.maxTouchPoints) {
 		onMobile = navigator.maxTouchPoints > 0;
-	} else if (navigator?.msMaxTouchPoints) {
+	}
+	// @ts-ignore
+	else if (navigator?.msMaxTouchPoints) {
+		// @ts-ignore
 		onMobile = navigator.msMaxTouchPoints > 0;
 	} else {
 		const mq = window?.matchMedia("(pointer:coarse)");
