@@ -14,7 +14,8 @@
     "express": "^4.17.1",
     "formidable": "^1.2.2",
     "mime-types": "^2.1.32",
-    "sharp": "^0.28.3"
+    "sharp": "^0.28.3",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.14.1",

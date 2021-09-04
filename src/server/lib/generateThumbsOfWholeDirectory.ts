@@ -4,6 +4,7 @@ import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 import normalizePath from "../fs/normalizePath";
 import generateThumb from "./generateThumb";
 import getImagesOfDirectory from "../fs/getImagesOfDirectory";
+import logger from "../logger";
 
 export default function generateThumbsOfWholeDirectory(relativePath: string) : Promise<any> {
     return new Promise((resolve, reject) => {
@@ -38,7 +39,7 @@ export default function generateThumbsOfWholeDirectory(relativePath: string) : P
 
                 thumbWorker.on("message", (message: any) => {
                     if (!message.hasOwnProperty("success")) {
-                        console.error("Received malformed message from thumbWorker!");
+                        logger.error("Received malformed message from thumbWorker!");
                         return void reject(new Error("Received malformed message from thumbWorker!"));
                     }
 
@@ -50,7 +51,7 @@ export default function generateThumbsOfWholeDirectory(relativePath: string) : P
                 });
 
                 thumbWorker.on("exit", (exitCode) => {
-                    console.info("Thumbnail worker has exited. Exit code:", exitCode);
+                    logger.info("Thumbnail worker has exited. Exit code:", exitCode);
                 });
             }).catch(reject);
         }).catch(reject);
@@ -58,7 +59,7 @@ export default function generateThumbsOfWholeDirectory(relativePath: string) : P
 }
 
 if (!isMainThread) {
-    console.info("Thumbnail worker has been initialized");
+    logger.info("Thumbnail worker has been initialized");
 
     (function() {
         function sendSuccess(value: any) {
@@ -66,16 +67,16 @@ if (!isMainThread) {
         }
 
         function sendError(value: any) {
+            logger.error("thumbWorker: " + value);
             parentPort?.postMessage({ success: false, value });
         }
 
         if (!Array.isArray(workerData)) {
-            console.error("worker_generateThumbsOfWholeDirectory was called with no workerData, this should not happen!");
             return void sendError("worker_generateThumbsOfWholeDirectory was called with no workerData, this should not happen!");
         }
 
         // workerData = imagesWithNoThumb
-        console.log("Generating thumbs for", workerData.length, "images");
+        logger.debug("Generating thumbs for", workerData.length, "images");
 
         let promises: Array<Promise<any>> = [];
 

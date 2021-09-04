@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 import * as fs from "fs";
 import * as path from "path";
 import express from "express";
@@ -12,7 +14,7 @@ import insertAllFilesIntoDatabase from "./database/insertAllFilesIntoDatabase";
 import directoryExists from "./fs/directoryExists";
 import normalizePath from "./fs/normalizePath";
 import Caching from "./lib/Caching";
-require("dotenv").config();
+import logger from "./logger";
 
 const THUMBNAIL_LOCATION = path.join(__dirname, "../../", process.env.THUMBNAIL_LOCATION as string);
 
@@ -35,7 +37,7 @@ if (process.env.caching === "true") {
         const hash = req.params.hash;
 
         if (cache.isThumbCached(hash)) {
-            console.log(`Cache hit: We have thumb "${hash}" in memory!`);
+            logger.debug(`Cache hit: We have thumb "${hash}" in memory!`);
 
             const thumb = cache.getCachedThumb(hash) as Buffer;
             
@@ -45,11 +47,12 @@ if (process.env.caching === "true") {
             })
             .end(thumb);
         } else {
-            console.log(`Cache miss: We don't have thumb "${hash}" in memory!`);
+            logger.debug(`Cache miss: We don't have thumb "${hash}" in memory!`);
 
             cache.storeThumb(hash, hash)
             .then((thumb) => {
-                console.info(`Stored thumb for "${hash}"`);
+                logger.debug(`Stored thumb for "${hash}"`);
+
                 return void res.writeHead(200, {
                     "Content-Type": "image/jpeg",
                     "Content-Length": thumb.length,
@@ -57,7 +60,7 @@ if (process.env.caching === "true") {
                 .end(thumb);
             })
             .catch(err => {
-                console.error("Could not get thumbnail from cache: " + (err?.message || "unknown error") + " :: Reading from filesystem...");
+                logger.error("Could not get thumbnail from cache: " + (err?.message || "unknown error") + " :: Reading from filesystem...");
 
                 return void next();
             });
@@ -84,6 +87,8 @@ if (process.env.NODE_ENV === "production") {
     }
 
     app.get(/^\/\$(preview|upload|bin)/, (req, res) => {
+        logger.http(JSON.stringify(req.headers, null, 4));
+        
         res.sendFile(path.join(__dirname, "../../build/index.html"));
     });
 }
@@ -233,9 +238,9 @@ app.post("/api/uploadFiles", (req, res) => {
 
 // @ts-ignore
 app.listen(process.env.SERVER_PORT, process.env.SERVER_HOST, function() {
-    console.log(`The server is listening to ${process.env.SERVER_HOST}:${process.env.SERVER_PORT}`);
+    logger.info(`The server is listening to ${process.env.SERVER_HOST}:${process.env.SERVER_PORT}`);
 
     if (process.env.pm_id === undefined) {
-        console.warn("You are not running the server with PM2! If the server crashes it won't start again.");
+        logger.warn("You are not running the server with PM2! If the server crashes it won't start again.");
     }
 });

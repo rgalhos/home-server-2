@@ -10,6 +10,7 @@
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -22,15 +23,16 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-########
+src/react-app-env.d.ts
+package-lock.json
+
+# private data
 /$thumbs
 /~thumbs
-
-/dist
-
-package-lock.json
 
 db.db3
 .env
 
-src/react-app-env.d.ts
+# logs
+logging.log
+http.log
