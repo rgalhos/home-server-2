@@ -1,9 +1,10 @@
-import { Box, Button, CircularProgress, FormControl } from "@material-ui/core";
+import { Box, Button, Container, FormControl, LinearProgress } from "@material-ui/core";
 import { Alert, AlertTitle } from "@material-ui/lab";
 import UploadFileListPreview from "./UploadFileListPreview";
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import React from "react";
+import axios from "axios";
 
 interface UploadFormProps {
     path: string,
@@ -13,6 +14,7 @@ interface UploadFormStates {
     files: FileList | null,
     enableUploadButton: boolean,
     isUploading: boolean,
+    uploadProgress: number,
     uploadCompleted: boolean,
     error: boolean,
     errorMessage: string,
@@ -27,6 +29,7 @@ export default class UploadForm extends React.Component<UploadFormProps, UploadF
             files: null,
             enableUploadButton: false,
             isUploading: false,
+            uploadProgress: 0,
             uploadCompleted: false,
             error: false,
             errorMessage: "",
@@ -35,6 +38,7 @@ export default class UploadForm extends React.Component<UploadFormProps, UploadF
 
         this.changeHandler = this.changeHandler.bind(this);
         this.handleUpload = this.handleUpload.bind(this);
+        this.onUploadProgress = this.onUploadProgress.bind(this);
     }
 
     changeHandler(event: React.ChangeEvent<HTMLInputElement>) {
@@ -55,36 +59,42 @@ export default class UploadForm extends React.Component<UploadFormProps, UploadF
             formData.append("fileToUpload[]", file);
         });
 
-        const url = "/api/uploadFiles?filesPath=" + encodeURIComponent(this.props.path);
+        const self = this;
 
         this.setState({
             isUploading: true,
         }, () => {
-            fetch(url, {
+            axios({
+                url: "/api/uploadFiles?filesPath=" + encodeURIComponent(this.props.path),
                 method: "POST",
-                body: formData,
-            })
-            .then((response) => response.json())
-            .then((response) => {
-                if (response.error) {
-                    this.setState({
-                        isUploading: false,
-                        uploadCompleted: true,
-                        success: false,
-                        error: true,
-                        errorMessage: response.error.message || "Unknown error",
-                    });
-                } else {
-                    this.setState({
-                        isUploading: false,
-                        uploadCompleted: true,
-                        success: true,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.dir(err);
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                data: formData,
+                onUploadProgress: self.onUploadProgress,
+            }).then(() => {
+                this.setState({
+                    isUploading: false,
+                    uploadCompleted: true,
+                    success: true,
+                });
+            }).catch(error => {
+                console.error(error);
+                
+                this.setState({
+                    isUploading: false,
+                    uploadCompleted: true,
+                    success: false,
+                    error: true,
+                    errorMessage: error?.message || "Unknown error",
+                });
             });
+        });
+    }
+
+    onUploadProgress({ loaded, total }: { loaded: number, total: number }) {
+        this.setState({
+            uploadProgress: Math.round((100 * loaded) / total),
         });
     }
 
@@ -129,10 +139,10 @@ export default class UploadForm extends React.Component<UploadFormProps, UploadF
         } else if (this.state.isUploading) {
             uploadDimScreen = (
                 <>
-                    <Box style={{ position: "absolute", top: "0", left: "0", width: "100%", height: "100%", backgroundColor: "rgba(0, 0, 0, .66)", zIndex: 9998 }}></Box>
-                    <Box style={{ position: "absolute", top: "calc(50% - 50px)", left: "calc(50% - 50px)", zIndex: 9999 }}>
-                        <CircularProgress size={100} />
-                    </Box>
+                    <Box style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0, 0, 0, .66)", zIndex: 9998 }}></Box>
+                    <Container style={{ position: "absolute", marginTop: "45vh", zIndex: 9999 }}>
+                        <LinearProgress variant="determinate" color="primary" value={this.state.uploadProgress} style={{ zIndex: 9999 }} />
+                    </Container>
                 </>
             )
         }
