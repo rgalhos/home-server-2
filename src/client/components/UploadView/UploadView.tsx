@@ -1,8 +1,9 @@
-import { Container, CircularProgress, Button, Breadcrumbs } from "@material-ui/core";
-import { Alert, AlertTitle } from "@material-ui/lab";
-import HistoryIcon from '@material-ui/icons/History';
 import React from "react";
 import axios from "axios";
+import { Container, CircularProgress, Button } from "@material-ui/core";
+import { Alert, AlertTitle } from "@material-ui/lab";
+import HistoryIcon from '@material-ui/icons/History';
+import NavigationBreadcrumb from "../DirectoryView/NavigationBreadcrumb/NavigationBreadcrumb";
 import UploadForm from "./UploadForm";
 
 interface UploadViewStates {
@@ -10,33 +11,40 @@ interface UploadViewStates {
     directoryExists: boolean,
     error: boolean,
     errorMessage: string,
-};
-
-const breadcrumbStyle: React.CSSProperties = {
-    margin: "15px 5px 5px 25px",
-    fontSize: "1rem",
-    fontWeight: 400,
-    lineHeight: "1.5",
-    letterSpacing: "0.00938em",
-    fontFamily: "\"Roboto\", \"Helvetica\", \"Arial\", sans-serif",
+    path: string,
 };
 
 export default class UploadView extends React.Component<any, UploadViewStates> {
-    public readonly path: string;
-
     constructor(props: any) {
         super(props);
 
-        this.path = window.location.hash.substr(1).replace(/\/+|\\+/g, '/');
+        const path = window.location.hash.substr(1).replace(/\/+|\\+/g, '/');
 
-        document.title = "Upload to " + this.path;
+        document.title = "Upload to " + path;
 
         this.state = {
             loaded: false,
             directoryExists: true,
             error: false,
             errorMessage: "",
+            path: path,
         };
+
+        this.changeDirectory = this.changeDirectory.bind(this);
+
+        const self = this;
+        window.onpopstate = function(event) {
+            event.preventDefault();
+            self.changeDirectory(window.location.hash.substr(1) || '/');
+        }
+    }
+
+    changeDirectory(path: string) {
+        path = path.replace(/\\+|\/+/g, '/') || '/';
+
+        document.title = "Upload to " + path;
+
+        this.setState({ path });
     }
 
     componentDidMount() {
@@ -44,7 +52,7 @@ export default class UploadView extends React.Component<any, UploadViewStates> {
             method: "GET",
             url: "/api/directoryExists",
             params: {
-                path: this.path,
+                path: this.state.path,
             }
         }).then(({ data }) => {
             this.setState({
@@ -79,10 +87,10 @@ export default class UploadView extends React.Component<any, UploadViewStates> {
         }
         
         const breadcrumbs = (
-            <Breadcrumbs style={breadcrumbStyle}>
-                <span>root</span>
-                { this.path.split('/').slice(1).map((dir, i) => ( <span key={i}>{dir}</span> )) }
-            </Breadcrumbs>
+            <NavigationBreadcrumb
+                path={this.state.path}
+                changeDirectory={this.changeDirectory}
+            />
         );
 
         if (!this.state.directoryExists) {
@@ -110,7 +118,7 @@ export default class UploadView extends React.Component<any, UploadViewStates> {
             <Container id="upload-view">
                 {breadcrumbs}
 
-                <UploadForm path={this.path} />
+                <UploadForm path={this.state.path} />
             </Container>
         );
     }
