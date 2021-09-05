@@ -8,6 +8,7 @@ import getFoldersOfDirectory from "./fs/getFoldersOfDirectory";
 import getFilesOfDirectory from "./fs/getFilesOfDirectory";
 import getFileInfo from "./fs/getFileInfo";
 import Database from "./database";
+import generateVideoThumbsOfWholeDirectory from "./lib/generateVideoThumbsOfWholeDirectory";
 import generateThumbsOfWholeDirectory from "./lib/generateThumbsOfWholeDirectory";
 import getImagesOfDirectory from "./fs/getImagesOfDirectory";
 import insertAllFilesIntoDatabase from "./database/insertAllFilesIntoDatabase";
@@ -163,7 +164,10 @@ app.get("/api/generateThumbsForDirectory", (req, res) => {
 
     if (path === "/") path = "";
 
-    generateThumbsOfWholeDirectory(path as string)
+    Promise.all([
+        generateThumbsOfWholeDirectory(path as string),
+        generateVideoThumbsOfWholeDirectory(path as string)
+    ])
     .then(() => {
         res.status(200).end();
     })
