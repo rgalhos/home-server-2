@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as crypto from "crypto";
+import { tmpdir } from "os";
 import Ffmpeg from "fluent-ffmpeg";
 import getVideoDurationInSeconds from "get-video-duration";
 import logger from "../logger";
@@ -32,12 +33,16 @@ export default function generateVideoThumb(absoluteFilePath: string, output: str
 
                     logger.debug(`Generating final thumbnail for ${absoluteFilePath}\t-> ${output}`);
 
+                    const conv = Ffmpeg();
+
+                    // TO DO: tirar isso
+                    if (process.env.FFMPEG_PATH)
+                        conv.setFfmpegPath(process.env.FFMPEG_PATH as string);
+
                     // ffmpeg  -i 1.mp4 -i 2.mp4 -i 3.mp4 -i 4.mp4 -i 5.mp4 -filter_complex "[0:v] [1:v] [2:v] [3:v] [4:v] concat=n=5:v=1 [vv]" -map "[vv]" out.mp4
-                    await Ffmpeg()
+                    await conv
                         //.on("stderr", logger.error)
                         .on("error", (e) => { logger.error(e); reject(e) })
-                        // TO DO: tirar isso
-                        .setFfmpegPath("C:\\ffmpeg\\bin\\ffmpeg.exe")
                         .input(fileList[0])
                         .input(fileList[1])
                         .input(fileList[2])
@@ -76,14 +81,18 @@ export default function generateVideoThumb(absoluteFilePath: string, output: str
 // ffmpeg -ss 900 -i lls3.mp4 -vf "select=eq(pict_type\,I), scale=360:-1" -vframes 1 t5.jpg
 function _genThumb(absoluteFilePath: string, startTime: number, previewTime: number) : Promise<string> {
     return new Promise(async (resolve, reject) => {
-        const tempFileName = path.join(__dirname, "./" + crypto.randomBytes(8).toString('hex') + ".mp4");
+        const tempFileName = path.join(tmpdir(), "./" + crypto.randomBytes(8).toString('hex') + ".mp4");
 
-        await Ffmpeg()
+        const conv = Ffmpeg();
+        
+        // TO DO: tirar isso
+        if (process.env.FFMPEG_PATH)
+            conv.setFfmpegPath(process.env.FFMPEG_PATH as string);
+
+        await conv
             .input(absoluteFilePath)
             //.on("stderr", logger.error)
             .on("error", (e) => { logger.error(e); reject(e) })
-            // TO DO: tirar isso
-            .setFfmpegPath("C:\\ffmpeg\\bin\\ffmpeg.exe")
             .noAudio()
             .setStartTime(startTime)
             .setDuration(previewTime)
