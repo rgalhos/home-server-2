@@ -1,8 +1,8 @@
 import * as fs from "fs";
-import normalizePath from "./normalizePath";
+import { toAbsolutePath } from "../utils";
 
 export default function directoryExists(relativePath: string) : Promise<boolean> {
-    const absolutePath = normalizePath(relativePath);
+    const absolutePath = toAbsolutePath(relativePath);
 
     return new Promise((resolve) => {
         resolve(fs.existsSync(absolutePath));

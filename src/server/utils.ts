@@ -1,6 +1,15 @@
 import * as path from "path";
 
-export default function normalizePath(absoluteOrRelativePath: string) : string {
+export function normalizePathParam(param: string) {
+    if (param === "/")
+        param = "";
+    
+    param = param.replace(/\\+|\/+/g, '/');
+
+    return param;
+}
+
+export function toAbsolutePath(absoluteOrRelativePath: string) : string {
     let k = absoluteOrRelativePath;
 
     let isAbsolute = path.isAbsolute(k);

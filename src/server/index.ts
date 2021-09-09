@@ -12,9 +12,9 @@ import generateThumbsOfWholeDirectory from "./lib/generateThumbsOfWholeDirectory
 import getImagesOfDirectory from "./fs/getImagesOfDirectory";
 import insertAllFilesIntoDatabase from "./database/insertAllFilesIntoDatabase";
 import directoryExists from "./fs/directoryExists";
-import normalizePath from "./fs/normalizePath";
 import Caching from "./lib/Caching";
 import logger from "./logger";
+import { normalizePathParam, toAbsolutePath } from "./utils";
 
 //#region optional dependencies
 let generateVideoThumbsOfWholeDirectory = (noop: string) => new Promise<any>(r => r(void 0));
@@ -42,6 +42,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../../build")));
 app.use("/~", express.static(process.env.FILESYSTEM_ROOT as string));
 
+//#region caching
 if (process.env.caching === "true") {
     app.use("/~thumbs/:hash", (req, res, next) => {
         const hash = req.params.hash;
@@ -77,9 +78,11 @@ if (process.env.caching === "true") {
         }
     });
 }
+//#endregion caching
 
 app.use("/~thumbs", express.static(THUMBNAIL_LOCATION));
 
+//#region authentication
 if (process.env.NODE_ENV === "production") {
     if (process.env.ENABLE_BASIC_AUTHENTICATION === "true") {
         app.use((req, res, next) => {
@@ -102,14 +105,23 @@ if (process.env.NODE_ENV === "production") {
         res.sendFile(path.join(__dirname, "../../build/index.html"));
     });
 }
+//#endregion authentication
+
+//#region api calls
+// Middleware
+app.use("/api/", (req, res, next) => {
+    if (req.query.path)
+        req.query.path = normalizePathParam(req.query.path as string);
+    if (req.query.filesPath)
+        req.query.filesPath = normalizePathParam(req.query.filesPath as string);
+
+    next();
+});
 
 app.get("/api/getFolders", (req, res) => {
-    let { path } = req.query;
+    const path = req.query.path as string;
 
-    if (path === "/") path = "";
-    path = (path as string).replace(/\\+|\/+/g, '/');
-
-    getFoldersOfDirectory(path as string)
+    getFoldersOfDirectory(path)
     .then((folders) => {
         res.status(200).send(folders);
     })
@@ -121,12 +133,9 @@ app.get("/api/getFolders", (req, res) => {
 });
 
 app.get("/api/getFiles", (req, res) => {
-    let { path } = req.query;
+    const path = req.query.path as string;
 
-    if (path === "/") path = "";
-    path = (path as string).replace(/\\+|\/+/g, '/');
-
-    getFilesOfDirectory(path as string)
+    getFilesOfDirectory(path)
     .then((folders) => {
         res.status(200).send(folders);
     })
@@ -138,9 +147,9 @@ app.get("/api/getFiles", (req, res) => {
 });
 
 app.get("/api/getFileInfo", (req, res) => {
-    let { hash } = req.query;
+    const hash = req.query.hash as string;
 
-    getFileInfo(db, hash as string)
+    getFileInfo(db, hash)
     .then((info) => {
         res.status(200).send(info);
     })
@@ -152,12 +161,9 @@ app.get("/api/getFileInfo", (req, res) => {
 });
 
 app.get("/api/getImages", (req, res) => {
-    let { path } = req.query;
+    const path = req.query.path as string;
 
-    if (path === "/") path = "";
-    path = (path as string).replace(/\\+|\/+/g, '/');
-
-    getImagesOfDirectory(path as string)
+    getImagesOfDirectory(path)
     .then((info) => {
         res.status(200).send(info);
     })
@@ -169,13 +175,11 @@ app.get("/api/getImages", (req, res) => {
 });
 
 app.get("/api/generateThumbsForDirectory", (req, res) => {
-    let { path } = req.query;
-
-    if (path === "/") path = "";
+    const path = req.query.path as string;
 
     Promise.all([
-        generateThumbsOfWholeDirectory(path as string),
-        generateVideoThumbsOfWholeDirectory(path as string)
+        generateThumbsOfWholeDirectory(path),
+        generateVideoThumbsOfWholeDirectory(path)
     ])
     .then(() => {
         res.status(200).end();
@@ -188,12 +192,9 @@ app.get("/api/generateThumbsForDirectory", (req, res) => {
 });
 
 app.get("/api/scanFiles", (req, res) => {
-    let { path } = req.query;
+    const path = req.query.path as string;
 
-    if (path === "/") path = "";
-    path = (path as string).replace(/\\+|\/+/g, '/');
-
-    insertAllFilesIntoDatabase(db, path as string)
+    insertAllFilesIntoDatabase(db, path)
     .then(() => {
         res.status(200).end();
     })
@@ -205,10 +206,7 @@ app.get("/api/scanFiles", (req, res) => {
 });
 
 app.get("/api/directoryExists", (req, res) => {
-    let { path } = req.query;
-
-    if (path === "/") path = "";
-    path = (path as string).replace(/\\+|\/+/g, '/');
+    const path = req.query.path as string;
 
     directoryExists(path).then((exists) => {
         res.status(200).send({ exists });
@@ -218,10 +216,7 @@ app.get("/api/directoryExists", (req, res) => {
 app.post("/api/uploadFiles", (req, res) => {
     logger.info("Requested file upload");
 
-    let { filesPath } = req.query;
-
-    if (filesPath === "/") filesPath = "";
-    filesPath = (filesPath as string).replace(/\\+|\/+/g, '/');
+    const filesPath = req.query.filesPath as string;
 
     const form = formidable({ multiples: true });
 
@@ -244,7 +239,7 @@ app.post("/api/uploadFiles", (req, res) => {
         Array.from(files['fileToUpload[]']).forEach(file => {
             promises.push(
                 new Promise<void>((resolve, reject) => {
-                    const newPath = path.join(normalizePath(filesPath as string), '/' + file.name);
+                    const newPath = path.join(toAbsolutePath(filesPath), '/' + file.name);
 
                     logger.debug(`Renaming ${file.path} \t -> ${newPath}`);
 
@@ -273,6 +268,7 @@ app.post("/api/uploadFiles", (req, res) => {
         });
     })
 });
+//#endregion api calls
 
 // @ts-ignore
 app.listen(process.env.SERVER_PORT, process.env.SERVER_HOST, function() {

@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
-import normalizePath from "../fs/normalizePath";
+import { toAbsolutePath } from "../utils";
 import generateThumb from "./generateThumb";
 import getImagesOfDirectory from "../fs/getImagesOfDirectory";
 import logger from "../logger";
@@ -82,7 +82,7 @@ if (!isMainThread) {
 
         workerData.forEach((image: { hash: string, path: string }) => {
             promises.push(
-                generateThumb(normalizePath(image.path), image.hash)
+                generateThumb(toAbsolutePath(image.path), image.hash)
             );
         });
 

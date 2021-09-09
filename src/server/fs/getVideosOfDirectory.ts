@@ -1,11 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
-
 import * as mime from "mime-types";
-import normalizePath from "./normalizePath";
 import getFileStats from "./getFileStats";
 import IFileInfo from "../../common/interfaces/IFileInfo";
 import hashFunc from "../lib/hashFunc";
+import { toAbsolutePath } from "../utils";
 
 export const supportedMimeTypes = [
     "video/3gpp",
@@ -18,7 +17,7 @@ export const supportedMimeTypes = [
 ];
 
 export default function getVideosOfDirectory(relativePath: string) : Promise<IFileInfo[]> {
-    const absolutePath = normalizePath(relativePath);
+    const absolutePath = toAbsolutePath(relativePath);
 
     return new Promise((resolve, reject) => {
         fs.readdir(absolutePath, { withFileTypes: true }, (err, files) => {

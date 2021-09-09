@@ -1,9 +1,8 @@
 import * as fs from "fs";
-
-import normalizePath from "./normalizePath";
+import { toAbsolutePath } from "../utils";
 
 export default function getFileStats(relativePath: string) : Promise<fs.Stats> {
-    const absolutePath = normalizePath(relativePath);
+    const absolutePath = toAbsolutePath(relativePath);
 
     return new Promise((resolve, reject) => {
         fs.stat(absolutePath, (err, stats) => {

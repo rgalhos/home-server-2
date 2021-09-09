@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
-import normalizePath from "../fs/normalizePath";
 import generateVideoThumb from "./generateVideoThumb";
 import logger from "../logger";
 import getVideosOfDirectory from "../fs/getVideosOfDirectory";
+import { toAbsolutePath } from "../utils";
 
 export default function generateVideoThumbsOfWholeDirectory(relativePath: string) : Promise<any> {
     return new Promise((resolve, reject) => {
@@ -81,7 +81,7 @@ if (!isMainThread) {
         let promises: Array<Promise<any>> = [];
 
         for (const video of workerData) {
-            await generateVideoThumb(normalizePath(video.path), video.hash).catch(sendError);
+            await generateVideoThumb(toAbsolutePath(video.path), video.hash).catch(sendError);
         }
 
         Promise.all(promises)

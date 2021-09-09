@@ -1,12 +1,11 @@
 import * as fs from "fs";
 import * as path from "path";
-
-import normalizePath from "./normalizePath";
 import getFolderOverview from "./getFolderOverview";
 import IFolderOverview from "../../common/interfaces/IFolderOverview";
+import { toAbsolutePath } from "../utils";
 
 export default function getFoldersOfDirectory(relativePath: string) : Promise<IFolderOverview[]> {
-    const absolutePath = normalizePath(relativePath);
+    const absolutePath = toAbsolutePath(relativePath);
 
     return new Promise((resolve, reject) => {
         fs.readdir(absolutePath, { withFileTypes: true }, (err, files) => {
