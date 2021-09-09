@@ -8,7 +8,6 @@ import getFoldersOfDirectory from "./fs/getFoldersOfDirectory";
 import getFilesOfDirectory from "./fs/getFilesOfDirectory";
 import getFileInfo from "./fs/getFileInfo";
 import Database from "./database";
-import generateVideoThumbsOfWholeDirectory from "./lib/generateVideoThumbsOfWholeDirectory";
 import generateThumbsOfWholeDirectory from "./lib/generateThumbsOfWholeDirectory";
 import getImagesOfDirectory from "./fs/getImagesOfDirectory";
 import insertAllFilesIntoDatabase from "./database/insertAllFilesIntoDatabase";
@@ -16,6 +15,16 @@ import directoryExists from "./fs/directoryExists";
 import normalizePath from "./fs/normalizePath";
 import Caching from "./lib/Caching";
 import logger from "./logger";
+
+//#region optional dependencies
+let generateVideoThumbsOfWholeDirectory = (noop: string) => new Promise<any>(r => r(void 0));
+
+try {
+    generateVideoThumbsOfWholeDirectory = require("./lib/generateVideoThumbsOfWholeDirectory").default;
+} catch (e) {
+    logger.warn("Optional dependencies were not installed: Video thumbnails won't be generated");
+}
+//#endregion optional dependencies
 
 const THUMBNAIL_LOCATION = path.join(__dirname, "../../", process.env.THUMBNAIL_LOCATION as string);
 
