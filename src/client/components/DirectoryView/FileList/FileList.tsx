@@ -63,13 +63,9 @@ export default class FileList extends React.Component<FileListProps, {}> {
         }
 
         // Sort by name
-        var sortingFn : (a: IFileInfo, b: IFileInfo) => number = (a, b) => {
-            let aName = a.name.toLowerCase();
-            let bName = b.name.toLowerCase();
-            if (aName > bName) return 1;
-            else if (aName < bName) return -1;
-            return 0;
-        };
+        var sortingFn : (a: IFileInfo, b: IFileInfo) => number = (a, b) => (
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
 
         let sorting = getFilesSorting();
 

@@ -36,6 +36,10 @@ export default class ImageList extends React.Component<ImageListProps, {}> {
     }
 
     render() {
+        if (this.imageList.length === 0) {
+            return ( <></> );
+        }
+        
         let thumbs = this.imageList
         .map((image) => (
             <ImageListItem key={image.hash} data-hash={image.hash}>

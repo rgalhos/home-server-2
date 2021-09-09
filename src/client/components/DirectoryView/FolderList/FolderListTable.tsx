@@ -25,11 +25,9 @@ export default class FolderListTable extends React.Component<FolderListTableProp
 
         let rows = this.props.folders
         // @ts-ignore
-        .sort((a, b) => {
-            if (a.name > b.name) return 1;
-            else if (a.name < b.name) return -1;
-            return 0;
-        })
+        .sort((a, b) =>
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        )
         .map(folder => {
             folder.path = '/' + folder.path;
             return folder;
