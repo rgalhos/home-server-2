@@ -33,12 +33,16 @@ export default function getFilesOfDirectory(relativePath: string) : Promise<IFil
                 promises.push(
                     getFileStats(path.join(absolutePath, file.name))
                     .then((stats) => {
+                        const _hash = hashFunc(_path, stats.ctime);
+                        const thumbLoc = path.join(process.env.THUMBNAIL_LOCATION as string, _hash + ".mp4");
+
                         fileList.push({
-                            hash: hashFunc(_path, stats.ctime),
+                            hash: _hash,
                             name: file.name,
                             path: _path,
                             size: stats.size,
-                            thumbnail: null,
+                            // TO DO: rever a lógica das thumbnails e implementar uma lista para ignorar essas checagens
+                            thumbnail: fs.existsSync(thumbLoc) ? thumbLoc : null,
                             accessTime: +stats.atime,
                             lastModified: +stats.mtime,
                             created: +stats.ctime,

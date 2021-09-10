@@ -39,7 +39,7 @@ export default class ImageList extends React.Component<ImageListProps, {}> {
         if (this.imageList.length === 0) {
             return ( <></> );
         }
-        
+
         let thumbs = this.imageList
         .map((image) => (
             <ImageListItem key={image.hash} data-hash={image.hash}>
@@ -61,7 +61,7 @@ export default class ImageList extends React.Component<ImageListProps, {}> {
         const noCols = Math.max(4, Math.trunc(Math.min(window.screen.width, 1280) / 100));
 
         return (
-            <Box id="image-list">
+            <Box id="image-list" style={{ marginBottom: "5%" }}>
                 <ImageListBox rowHeight={100} cols={noCols} style={{ margin: "0px" }}>
                     {thumbs}
                 </ImageListBox>

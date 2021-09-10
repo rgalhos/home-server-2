@@ -4,16 +4,20 @@ import axios from "axios";
 import { CircularProgress, Container } from "@material-ui/core";
 import FolderList from "./FolderList/FolderList";
 import FileList from "./FileList/FileList";
+import ImageList from "./ImageList/ImageList";
+import VideoList from "./VideoList/VideoList";
 import IFileInfo from "../../../common/interfaces/IFileInfo";
 import IFolderOverview from "../../../common/interfaces/IFolderOverview";
-import ImageList from "./ImageList/ImageList";
 import SwipeableDrawerDirectory from "./SwipeableDrawerDirectory";
+import { getSettings } from "../../utils/utils";
+import { isVideo } from "../../utils/mimeTypes";
 
 interface States {
     path: string,
     fileList: null | IFileInfo[],
     folderList: null | IFolderOverview[],
     imageList: null | IFileInfo[],
+    videoList: null | IFileInfo[],
     error: boolean,
     errorMessage: string,
 };
@@ -28,6 +32,7 @@ class DirectoryView extends React.Component<{}, States> {
             fileList: null,
             folderList: null,
             imageList: null,
+            videoList: null,
             error: false,
             errorMessage: "",
         };
@@ -37,6 +42,7 @@ class DirectoryView extends React.Component<{}, States> {
         this.updateFileList = this.updateFileList.bind(this);
         this.updateImageList = this.updateImageList.bind(this);
         this.generateThumbsForDirectory = this.generateThumbsForDirectory.bind(this);
+        this.filterVideoPreviews = this.filterVideoPreviews.bind(this);
         this.scanFiles = this.scanFiles.bind(this);
 
         window.onpopstate = (event) => {
@@ -62,12 +68,19 @@ class DirectoryView extends React.Component<{}, States> {
             fileList: null,
             folderList: null,
             imageList: null,
+            videoList: null,
         }, () => {
             self.scanFiles(() => {
                 self.updateFolderList(() => {
                     self.updateFileList(() => {
                         self.generateThumbsForDirectory(() => {
-                            self.updateImageList();
+                            self.updateImageList(() => {
+                                getSettings().then(({ data }) => {
+                                    if (data.videoThumbnails) {
+                                        self.filterVideoPreviews();
+                                    }
+                                });
+                            });
                         });
                     });
                 });
@@ -167,10 +180,17 @@ class DirectoryView extends React.Component<{}, States> {
             cb()
         });
     }
+
+    filterVideoPreviews() {
+        this.setState({
+            videoList: (this.state.fileList || []).filter(({ name }) => isVideo(name)),
+            fileList: (this.state.fileList || []).filter(({ name }) => !isVideo(name)),
+        }, () => console.dir(this.state));
+    }
     
     render() {
         let contents;
-        if (this.state.fileList === null || this.state.folderList === null || this.state.imageList === null) {
+        if (this.state.fileList === null || this.state.folderList === null || this.state.imageList === null || this.state.videoList === null) {
             contents = (
                 <div style={{ position: "absolute", top: "calc(50% - 50px)", left: "calc(50% - 50px)" }}>
                     <CircularProgress size={100} />
@@ -188,6 +208,11 @@ class DirectoryView extends React.Component<{}, States> {
                     <ImageList
                         path={this.state.path}
                         imageList={this.state.imageList}
+                    />
+
+                    <VideoList
+                        path={this.state.path}
+                        videoList={this.state.videoList}
                     />
 
                     <FileList

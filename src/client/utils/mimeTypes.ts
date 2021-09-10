@@ -21,10 +21,10 @@ const imageMimeTypes = [
 
 const videoMimeTypes = [
     "video/mp4",
-    "video/x-matroska",
-    "video/webm",
-    "video/quicktime",
-    "video/x-msvideo"
+    //"video/x-matroska",
+    //"video/webm",
+    //"video/quicktime",
+    //"video/x-msvideo"
 ];
 
 export { imageMimeTypes, videoMimeTypes };

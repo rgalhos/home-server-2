@@ -2,7 +2,7 @@ require("dotenv").config();
 
 import * as fs from "fs";
 import * as path from "path";
-import express from "express";
+import express, { application } from "express";
 import formidable from "formidable";
 import getFoldersOfDirectory from "./fs/getFoldersOfDirectory";
 import getFilesOfDirectory from "./fs/getFilesOfDirectory";
@@ -17,10 +17,12 @@ import logger from "./logger";
 import { normalizePathParam, toAbsolutePath } from "./utils";
 
 //#region optional dependencies
+let VIDEO_THUMBNAILS = false;
 let generateVideoThumbsOfWholeDirectory = (noop: string) => new Promise<any>(r => r(void 0));
 
 try {
     generateVideoThumbsOfWholeDirectory = require("./lib/generateVideoThumbsOfWholeDirectory").default;
+    VIDEO_THUMBNAILS = process.env.VIDEO_THUMBNAILS === "true";
 } catch (e) {
     logger.warn("Optional dependencies were not installed: Video thumbnails won't be generated");
 }
@@ -43,7 +45,7 @@ app.use(express.static(path.join(__dirname, "../../build")));
 app.use("/~", express.static(process.env.FILESYSTEM_ROOT as string));
 
 //#region caching
-if (process.env.caching === "true") {
+if (process.env.CACHING === "true") {
     app.use("/~thumbs/:hash", (req, res, next) => {
         const hash = req.params.hash;
 
@@ -267,6 +269,13 @@ app.post("/api/uploadFiles", (req, res) => {
             res.status(500).send({ error: true, message: e.message });
         });
     })
+});
+
+app.get("/api/getEnvironment", (req, res) => {
+    res.status(200).send({
+        videoThumbnails: VIDEO_THUMBNAILS,
+        caching: process.env.CACHING === "true",
+    });
 });
 //#endregion api calls
 

@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export function bytesToSizeString(bytes: number, precision = 1) : string{
 	let sizes = [null, 'B', 'KB', 'MB', 'GB', 'TB'];
 	let i = 0;
@@ -36,4 +38,11 @@ export function isOnMobile() {
 	}
 
 	return onMobile;
+}
+
+export function getSettings() {
+	return axios({
+		url: "/api/getEnvironment",
+		method: "GET",
+	});
 }
