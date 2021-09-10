@@ -42,23 +42,26 @@ export default class ImageList extends React.Component<ImageListProps, {}> {
 
         let thumbs = this.imageList
         .map((image) => (
-            <ImageListItem key={image.hash} data-hash={image.hash}>
-                <Link href={"/$preview/" + image.hash}>
-                    <img
-                        src={'/' + image.thumbnail as string}
-                        alt={image.name}
-                        loading="lazy"
-                        width={100}
-                        height={100}
-                    />
-                </Link>
+            <ImageListItem
+                key={image.hash}
+                data-hash={image.hash}
+                component={Link}
+                href={"/$preview/" + image.hash}
+            >
+                <img
+                    src={'/' + image.thumbnail as string}
+                    alt={image.name}
+                    loading="lazy"
+                    width={100}
+                    height={100}
+                />
             </ImageListItem>
         ));
 
         // Número de colunas depende do tamanho da tela
         // Trunc(Max(vw, 1280) / 100)
         // No mínimo 4 imagens por linha
-        const noCols = Math.max(4, Math.trunc(Math.min(window.screen.width, 1280) / 100));
+        const noCols = Math.max(4, Math.trunc(Math.min(window.innerWidth, 1280) / 100));
 
         return (
             <Box id="image-list" style={{ marginBottom: "5%" }}>

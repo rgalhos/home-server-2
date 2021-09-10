@@ -41,6 +41,17 @@ export default class VideoList extends React.Component<VideoListProps, {}> {
     }
 }
 
+function playVideo({ current: video }: { current: HTMLVideoElement | null }) {
+    video?.play();
+}
+
+function stopVideo({ current: video }: { current: HTMLVideoElement | null }) {
+    if (video) {
+        video.pause();
+        video.currentTime = 0;
+    }
+}
+
 const VideoItem = ({ video }: { video: IFileInfo} ) => {
     const ref: React.Ref<HTMLVideoElement> = React.useRef<HTMLVideoElement>(null);
 
@@ -55,10 +66,10 @@ const VideoItem = ({ video }: { video: IFileInfo} ) => {
         <ImageListItem
             data-hash={video.hash}
             style={style}
-            onTouchStart={ () => { ref?.current?.play() } }
-            onTouchEnd={ () => { if (ref.current) { ref.current.pause(); ref.current.currentTime = 0; } } }
-            onMouseOver={ () => { ref?.current?.play() } }
-            onMouseOut={ () => { if (ref.current) { ref.current.pause(); ref.current.currentTime = 0; } } }
+            onTouchStart={() => playVideo(ref) }
+            onTouchEnd={ () => stopVideo(ref) }
+            onMouseOver={ () => playVideo(ref) }
+            onMouseOut={ () => stopVideo(ref) }
         >
             <Link href={"/$preview/" + video.hash}>
                 <video

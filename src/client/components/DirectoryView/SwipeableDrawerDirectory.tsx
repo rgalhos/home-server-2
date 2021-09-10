@@ -1,11 +1,11 @@
 import React from "react";
-import { List, ListItem, ListItemIcon, ListItemText, Switch, SwipeableDrawer, ListItemSecondaryAction, ListSubheader, Link } from "@material-ui/core";
+import { List, ListItem, ListItemIcon, ListItemText, Switch, SwipeableDrawer, ListItemSecondaryAction, ListSubheader, Link, SwipeableDrawerProps, AppBar, IconButton, Toolbar } from "@material-ui/core";
 import DeleteIcon from '@material-ui/icons/Delete';
+import MenuIcon from '@material-ui/icons/Menu';
 import NightsStayIcon from '@material-ui/icons/NightsStay';
 import WbSunnyIcon from '@material-ui/icons/WbSunny';
 import BackupIcon from '@material-ui/icons/Backup';
 import { getUserTheme, setUserTheme } from "../../utils/session";
-import { isOnMobile } from "../../utils/utils";
 
 interface SwipeableDrawerDirectoryProps {
     path: string,
@@ -22,6 +22,10 @@ export default function SwipeableDrawerDirectory(props: SwipeableDrawerDirectory
         console.log("Theme set to", theme);
         setUserTheme(theme);
         setTimeout(() => window.location.reload(), 100);
+    }
+
+    function toggleDrawer() {
+        setOpen(!isOpen);
     }
 
     function onClose() {
@@ -66,17 +70,41 @@ export default function SwipeableDrawerDirectory(props: SwipeableDrawerDirectory
         </div>
     );
 
+    let drawerVariant: SwipeableDrawerProps["variant"];
+    let appBar = ( <></> );
+
+    // 1280 (max container width) + 225*2 (225 = drawer width) - 30 (padding)
+    if (window.innerWidth >= 1700) {
+        drawerVariant = "permanent"
+    } else {
+        drawerVariant = "temporary";
+
+        appBar = (
+            <AppBar position="sticky" color="inherit">
+                <Toolbar>
+                    <IconButton color="inherit" onClick={toggleDrawer} edge="start">
+                        <MenuIcon /> 
+                    </IconButton>
+                </Toolbar>
+            </AppBar>
+        );
+    }
+
     return (
-        <SwipeableDrawer
-            disableDiscovery={true}
-            anchor="left"
-            onClose={onClose}
-            onOpen={onOpen}
-            open={isOpen}
-            variant={isOnMobile() ? "temporary" : "permanent"}
-        >
-            {list}
-        </SwipeableDrawer>
+        <>
+            {appBar}
+            
+            <SwipeableDrawer
+                disableDiscovery={true}
+                anchor="left"
+                onClose={onClose}
+                onOpen={onOpen}
+                open={isOpen}
+                variant={drawerVariant}
+            >
+                {list}
+            </SwipeableDrawer>
+        </>
     )
 }
 

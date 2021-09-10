@@ -223,13 +223,15 @@ class DirectoryView extends React.Component<{}, States> {
         }
 
         return (
-            <Container id="directory-view">
+            <>
                 <SwipeableDrawerDirectory
                     path={this.state.path}
                 />
                 
-                {contents}
-            </Container>
+                <Container id="directory-view">
+                    {contents}
+                </Container>
+            </>
         );
     }
 }
