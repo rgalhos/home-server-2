@@ -35,7 +35,7 @@ export default class Database {
 
         try {
             return stmt.get(hash);
-        } catch (e) {
+        } catch (e: any) {
             return {
                 error: true,
                 code: e.code,

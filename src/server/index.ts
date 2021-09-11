@@ -2,7 +2,8 @@ require("dotenv").config();
 
 import * as fs from "fs";
 import * as path from "path";
-import express, { application } from "express";
+import { tmpdir } from "os"
+import express from "express";
 import formidable from "formidable";
 import getFoldersOfDirectory from "./fs/getFoldersOfDirectory";
 import getFilesOfDirectory from "./fs/getFilesOfDirectory";
@@ -28,7 +29,10 @@ try {
 }
 //#endregion optional dependencies
 
-const THUMBNAIL_LOCATION = path.join(__dirname, "../../", process.env.THUMBNAIL_LOCATION as string);
+const THUMBNAIL_LOCATION = path.isAbsolute(process.env.THUMBNAIL_LOCATION as string)
+    ? process.env.THUMBNAIL_LOCATION as string
+    : path.join(__dirname, "../../", process.env.THUMBNAIL_LOCATION as string)
+;
 
 if (!fs.existsSync(THUMBNAIL_LOCATION)) {
     fs.mkdirSync(THUMBNAIL_LOCATION);
