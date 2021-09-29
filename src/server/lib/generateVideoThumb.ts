@@ -43,15 +43,7 @@ export default function generateVideoThumb(absoluteFilePath: string, hash: strin
 
                     logger.debug(`Generating final thumbnail for ${absoluteFilePath}\t-> ${output}`);
 
-                    const conv = Ffmpeg();
-
-                    // TO DO: tirar isso
-                    /*
-                    if (process.env.FFMPEG_PATH)
-                        conv.setFfmpegPath("D:/ffmpeg/bin/ffmpeg.exe");
-                    */
-
-                    await conv
+                    Ffmpeg()
                         .on("error", (e) => {
                             logger.error(e);
 
@@ -69,7 +61,7 @@ export default function generateVideoThumb(absoluteFilePath: string, hash: strin
                         .input(fileList[1])
                         .input(fileList[2])
                         .input(fileList[3])
-                        .videoCodec("libx264")
+                        .videoCodec(process.env.FFMPEG_DEFAULT_VIDEO_CODEC as string)
                         .addOption([ "-crf 27", "-preset veryfast" ])
                         .noAudio()
                         .complexFilter("[0:v] [1:v] [2:v] [3:v] concat=n=4:v=1 [vv]")
@@ -108,7 +100,7 @@ function _genThumb(absoluteFilePath: string, startTime: number, previewTime: num
             .noAudio()
             .setStartTime(startTime)
             .setDuration(previewTime)
-            .videoCodec("libx264")
+            .videoCodec(process.env.FFMPEG_DEFAULT_VIDEO_CODEC as string)
             .addOption([ "-crf 27", "-preset veryfast" ])
             .outputFPS(12)
             .size("480x?")

@@ -173,15 +173,23 @@ app.get("/api/generateThumbsForDirectory", (req, res) => {
     // Prevents ffmpeg from r*ping all system resources
     if (ALREADY_GENERATING_THUMBS) {
         logger.info("Page access: Server is too busy generating thumbnails");
-        return void res.status(200).send({ error: false, message: "Server is too busy generating thumbnails. Slowdowns are expected and some thumbs may not be shown." });
+        return void res.status(200).send({
+            error: false,
+            message: "Server is too busy generating thumbnails. Slowdowns are expected and some thumbs may not be shown.",
+        });
     }
 
     ALREADY_GENERATING_THUMBS = true;
 
-    Promise.all([
-        generateThumbsOfWholeDirectory(path),
-        generateVideoThumbsOfWholeDirectory(path)
-    ])
+    generateVideoThumbsOfWholeDirectory(path)
+    .catch((error) => {
+        logger.error(error);
+    })
+    .finally(() => {
+        ALREADY_GENERATING_THUMBS = false;
+    });
+
+    generateThumbsOfWholeDirectory(path)
     .then(() => {
         res.status(200).end();
     })
@@ -189,8 +197,6 @@ app.get("/api/generateThumbsForDirectory", (req, res) => {
         logger.error(error);
 
         res.status(500).send({ error: true, message: error?.message || error });
-    }).finally(() => {
-        ALREADY_GENERATING_THUMBS = false;
     });
 });
 
