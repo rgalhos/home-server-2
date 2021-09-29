@@ -127,7 +127,7 @@ class DirectoryView extends React.Component<{}, States> {
             this.setState({
                 fileList: data.filter((file: any) => file.type === "file" || file.thumbnail === null),
                 imageList: data.filter((file: any) => file.type === "image" && !!file.thumbnail),
-                videoList: data.filter((file: any) => file.type === "video" && !!file.thumbnail).slice(0, 50),
+                videoList: data.filter((file: any) => file.type === "video" && !!file.thumbnail),
             }, cb);
         }).catch((error) => {
             console.error(error);
