@@ -49,7 +49,7 @@ export default class ImageList extends React.Component<ImageListProps, {}> {
                 href={"/$preview/" + image.hash}
             >
                 <img
-                    src={'/' + image.thumbnail as string}
+                    src={'/~thumbs/' + image.thumbnail as string}
                     alt={image.name}
                     loading="lazy"
                     width={100}

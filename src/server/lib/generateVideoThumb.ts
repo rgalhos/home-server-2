@@ -10,7 +10,14 @@ const NO_THUMBNAILS = 5;
 
 export default function generateVideoThumb(absoluteFilePath: string, output: string) : Promise<void> {
     return new Promise((resolve, reject) => {
-        getVideoDurationInSeconds(absoluteFilePath).then((duration) => {
+        //getVideoDurationInSeconds(absoluteFilePath).then((duration) => {
+        Ffmpeg.ffprobe(absoluteFilePath, (err, data) => {
+            if (err) {
+                return reject(err);
+            }
+
+            const duration = data.format.duration!;
+
             (async () => {
                 let fileList: string[] = [];
                 let time = Math.trunc(duration / 6);
@@ -37,12 +44,13 @@ export default function generateVideoThumb(absoluteFilePath: string, output: str
 
                     // TO DO: tirar isso
                     if (process.env.FFMPEG_PATH)
-                        conv.setFfmpegPath(process.env.FFMPEG_PATH as string);
+                        conv.setFfmpegPath("D:/ffmpeg/bin/ffmpeg.exe");
 
                     // ffmpeg  -i 1.mp4 -i 2.mp4 -i 3.mp4 -i 4.mp4 -i 5.mp4 -filter_complex "[0:v] [1:v] [2:v] [3:v] [4:v] concat=n=5:v=1 [vv]" -map "[vv]" out.mp4
                     await conv
                         //.on("stderr", logger.error)
-                        .on("error", (e) => { logger.error(e); reject(e) })
+                        .on("error", (e) => { logger.error(e); /*reject(e)*/ resolve() })
+                        .on("end", resolve)
                         .input(fileList[0])
                         .input(fileList[1])
                         .input(fileList[2])
@@ -69,11 +77,9 @@ export default function generateVideoThumb(absoluteFilePath: string, output: str
                             }
                         });
                     }, 10000);
-
-                    resolve();
                 }, 2000);
             })();
-        }).catch(reject);
+        });
     });
 }
 
@@ -87,7 +93,7 @@ function _genThumb(absoluteFilePath: string, startTime: number, previewTime: num
         
         // TO DO: tirar isso
         if (process.env.FFMPEG_PATH)
-            conv.setFfmpegPath(process.env.FFMPEG_PATH as string);
+            conv.setFfmpegPath("D:/ffmpeg/bin/ffmpeg.exe");
 
         await conv
             .input(absoluteFilePath)
@@ -101,7 +107,7 @@ function _genThumb(absoluteFilePath: string, startTime: number, previewTime: num
             .size("480x?")
             .setAspectRatio("16:9")
             .autoPad()
-            .outputOption("-movflags faststart")
+            //.outputOption("-movflags faststart")
             .save(tempFileName)
         ;
         

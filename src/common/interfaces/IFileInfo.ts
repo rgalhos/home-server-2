@@ -8,4 +8,5 @@ export default interface IFileInfo {
     accessTime: number, // atime
     lastModified: number, // mtime
     created: number, // birthtime
+    type: 'file' | 'image' | 'video',
 };

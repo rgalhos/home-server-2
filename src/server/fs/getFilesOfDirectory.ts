@@ -8,6 +8,16 @@ import hashFunc from "../lib/hashFunc";
 import { supportedMimeTypes } from "../lib/generateThumb";
 import { toAbsolutePath } from "../utils";
 
+const supportedVideoMimeTypes = [
+    "video/3gpp",
+    "video/mp4",
+    "video/mpeg",
+    "video/quicktime",
+    "video/x-ms-wmv",
+    "video/x-msvideo",
+    "video/x-matroska"
+];
+
 export default function getFilesOfDirectory(relativePath: string) : Promise<IFileInfo[]> {
     const absolutePath = toAbsolutePath(relativePath);
 
@@ -21,8 +31,7 @@ export default function getFilesOfDirectory(relativePath: string) : Promise<IFil
                 });
             }
 
-            files = files.filter(dirent => !dirent.isDirectory() && !dirent.isSymbolicLink())
-                .filter(({ name }) => supportedMimeTypes.indexOf(mime.lookup(name) as string) === -1);
+            files = files.filter(dirent => !dirent.isDirectory() && !dirent.isSymbolicLink());
 
             let promises: Array<Promise<unknown>> = [];
             let fileList: IFileInfo[] = [];
@@ -34,7 +43,26 @@ export default function getFilesOfDirectory(relativePath: string) : Promise<IFil
                     getFileStats(path.join(absolutePath, file.name))
                     .then((stats) => {
                         const _hash = hashFunc(_path, stats.ctime);
-                        const thumbLoc = path.join(process.env.THUMBNAIL_LOCATION as string, _hash + ".mp4");
+
+                        let thumb: string | null = null;
+                        let type: IFileInfo["type"] = "file";
+
+                        if (supportedMimeTypes.indexOf(mime.lookup(file.name) as string) !== -1) {
+                            type = "image"
+                        } else if (supportedVideoMimeTypes.indexOf(mime.lookup(file.name) as string) !== -1) {
+                            type = "video";
+                        }
+
+                        if (type !== "file") {
+                            let jpgThumb = path.join(process.env.THUMBNAIL_LOCATION as string, _hash + ".jpg");
+                            let mp4Thumb = path.join(process.env.THUMBNAIL_LOCATION as string, _hash + ".mp4");
+
+                            if (fs.existsSync(jpgThumb)) {
+                                thumb = _hash + ".jpg";
+                            } else if (fs.existsSync(mp4Thumb)) {
+                                thumb = _hash + ".mp4";
+                            }
+                        }
 
                         fileList.push({
                             hash: _hash,
@@ -42,15 +70,17 @@ export default function getFilesOfDirectory(relativePath: string) : Promise<IFil
                             path: _path,
                             size: stats.size,
                             // TO DO: rever a lógica das thumbnails e implementar uma lista para ignorar essas checagens
-                            thumbnail: fs.existsSync(thumbLoc) ? thumbLoc : null,
+                            thumbnail: thumb,
                             accessTime: +stats.atime,
                             lastModified: +stats.mtime,
                             created: +stats.ctime,
                             mimeType: mime.lookup(file.name),
+                            type: type,
                         } as IFileInfo);
                     })
                     .catch((error) => {
                         console.error(error);
+                        reject(error);
                     })
                 );
             });

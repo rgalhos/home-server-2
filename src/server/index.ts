@@ -2,7 +2,6 @@ require("dotenv").config();
 
 import * as fs from "fs";
 import * as path from "path";
-import { tmpdir } from "os"
 import express from "express";
 import formidable from "formidable";
 import getFoldersOfDirectory from "./fs/getFoldersOfDirectory";
@@ -10,7 +9,6 @@ import getFilesOfDirectory from "./fs/getFilesOfDirectory";
 import getFileInfo from "./fs/getFileInfo";
 import Database from "./database";
 import generateThumbsOfWholeDirectory from "./lib/generateThumbsOfWholeDirectory";
-import getImagesOfDirectory from "./fs/getImagesOfDirectory";
 import insertAllFilesIntoDatabase from "./database/insertAllFilesIntoDatabase";
 import directoryExists from "./fs/directoryExists";
 import Caching from "./lib/Caching";
@@ -25,6 +23,7 @@ try {
     generateVideoThumbsOfWholeDirectory = require("./lib/generateVideoThumbsOfWholeDirectory").default;
     VIDEO_THUMBNAILS = process.env.VIDEO_THUMBNAILS === "true";
 } catch (e) {
+    logger.error(e);
     logger.warn("Optional dependencies were not installed: Video thumbnails won't be generated");
 }
 //#endregion optional dependencies
@@ -166,6 +165,7 @@ app.get("/api/getFileInfo", (req, res) => {
     });
 });
 
+/*
 app.get("/api/getImages", (req, res) => {
     const path = req.query.path as string;
 
@@ -179,6 +179,7 @@ app.get("/api/getImages", (req, res) => {
         res.status(400).send(error);
     });
 });
+*/
 
 app.get("/api/generateThumbsForDirectory", (req, res) => {
     const path = req.query.path as string;
@@ -239,6 +240,7 @@ app.post("/api/uploadFiles", (req, res) => {
             files['fileToUpload[]'] = [ files['fileToUpload[]'] ];
         }
 
+        // @ts-ignore
         logger.info(`Uploading ${files['fileToUpload[]'].length} files`);
 
         // @ts-ignore

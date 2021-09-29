@@ -3,12 +3,14 @@ import * as path from "path";
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 import { toAbsolutePath } from "../utils";
 import generateThumb from "./generateThumb";
-import getImagesOfDirectory from "../fs/getImagesOfDirectory";
+//import getImagesOfDirectory from "../fs/_getImagesOfDirectory";
 import logger from "../logger";
+import getFilesOfDirectory from "../fs/getFilesOfDirectory";
 
 export default function generateThumbsOfWholeDirectory(relativePath: string) : Promise<any> {
     return new Promise((resolve, reject) => {
-        getImagesOfDirectory(relativePath).then((images) => {
+        getFilesOfDirectory(relativePath).then((files) => {
+            const images = files.filter(({ type }) => type === "image");
             let promises: Array<Promise<any>> = [];
 
             images.forEach((image) => {

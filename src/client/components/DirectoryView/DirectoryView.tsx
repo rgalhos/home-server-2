@@ -9,8 +9,6 @@ import VideoList from "./VideoList/VideoList";
 import IFileInfo from "../../../common/interfaces/IFileInfo";
 import IFolderOverview from "../../../common/interfaces/IFolderOverview";
 import SwipeableDrawerDirectory from "./SwipeableDrawerDirectory";
-import { getSettings } from "../../utils/utils";
-import { isVideo } from "../../utils/mimeTypes";
 
 interface States {
     path: string,
@@ -40,9 +38,7 @@ class DirectoryView extends React.Component<{}, States> {
         this.changeDirectory = this.changeDirectory.bind(this);
         this.updateFolderList = this.updateFolderList.bind(this);
         this.updateFileList = this.updateFileList.bind(this);
-        this.updateImageList = this.updateImageList.bind(this);
         this.generateThumbsForDirectory = this.generateThumbsForDirectory.bind(this);
-        this.filterVideoPreviews = this.filterVideoPreviews.bind(this);
         this.scanFiles = this.scanFiles.bind(this);
 
         window.onpopstate = (event) => {
@@ -59,8 +55,6 @@ class DirectoryView extends React.Component<{}, States> {
         path = path.replace(/\\+|\/+/g, '/');
         path = path || '/';
 
-        const self = this;
-
         document.title = "Contents of " + path;
 
         this.setState({
@@ -70,18 +64,10 @@ class DirectoryView extends React.Component<{}, States> {
             imageList: null,
             videoList: null,
         }, () => {
-            self.scanFiles(() => {
-                self.updateFolderList(() => {
-                    self.updateFileList(() => {
-                        self.generateThumbsForDirectory(() => {
-                            self.updateImageList(() => {
-                                getSettings().then(({ data }) => {
-                                    if (data.videoThumbnails) {
-                                        self.filterVideoPreviews();
-                                    }
-                                });
-                            });
-                        });
+            this.scanFiles(() => {
+                this.updateFolderList(() => {
+                    this.generateThumbsForDirectory(() => {
+                        this.updateFileList();
                     });
                 });
             });
@@ -100,7 +86,10 @@ class DirectoryView extends React.Component<{}, States> {
         .catch((error) => {
             console.error(error);
 
-            cb();
+            this.setState({
+                error: true,
+                errorMessage: error,
+            });
         });
     }
 
@@ -119,7 +108,7 @@ class DirectoryView extends React.Component<{}, States> {
             this.setState({
                 error: true,
                 errorMessage: error.message,
-            }, cb);
+            });
         });
     }
 
@@ -132,7 +121,9 @@ class DirectoryView extends React.Component<{}, States> {
             },
         }).then(({ data }) => {
             this.setState({
-                fileList: data,
+                fileList: data.filter((file: any) => file.type === "file" || data.thumbnail === null),
+                imageList: data.filter((file: any) => file.type === "image" && !!file.thumbnail),
+                videoList: data.filter((file: any) => file.type === "video" && !!file.thumbnail),
             }, cb);
         }).catch((error) => {
             console.error(error);
@@ -140,28 +131,7 @@ class DirectoryView extends React.Component<{}, States> {
             this.setState({
                 error: true,
                 errorMessage: error.message,
-            }, cb);
-        });
-    }
-
-    updateImageList(cb: () => void = function noop() { }) {
-        axios({
-            url: "/api/getImages",
-            method: "GET",
-            params: {
-                path: this.state.path,
-            },
-        }).then(({ data }) => {
-            this.setState({
-                imageList: data,
-            }, cb);
-        }).catch((error) => {
-            console.error(error);
-
-            this.setState({
-                error: true,
-                errorMessage: error.message,
-            }, cb);
+            });
         });
     }
 
@@ -172,24 +142,21 @@ class DirectoryView extends React.Component<{}, States> {
             params: {
                 path: this.state.path,
             },
-        }).then(() => {
-            cb();
-        }).catch((error) => {
+        })
+        .then(cb)
+        .catch((error) => {
             console.error(error);
-
-            cb()
+            
+            this.setState({
+                error: true,
+                errorMessage: error.message,
+            });
         });
     }
 
-    filterVideoPreviews() {
-        this.setState({
-            videoList: (this.state.fileList || []).filter(({ name }) => isVideo(name)),
-            fileList: (this.state.fileList || []).filter(({ name }) => !isVideo(name)),
-        }, () => console.dir(this.state));
-    }
-    
     render() {
         let contents;
+        
         if (this.state.fileList === null || this.state.folderList === null || this.state.imageList === null || this.state.videoList === null) {
             contents = (
                 <div style={{ position: "absolute", top: "calc(50% - 50px)", left: "calc(50% - 50px)" }}>

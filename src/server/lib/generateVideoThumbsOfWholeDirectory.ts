@@ -3,12 +3,14 @@ import * as path from "path";
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 import generateVideoThumb from "./generateVideoThumb";
 import logger from "../logger";
-import getVideosOfDirectory from "../fs/getVideosOfDirectory";
+//import getVideosOfDirectory from "../fs/getVideosOfDirectory";
 import { toAbsolutePath } from "../utils";
+import getFilesOfDirectory from "../fs/getFilesOfDirectory";
 
 export default function generateVideoThumbsOfWholeDirectory(relativePath: string) : Promise<any> {
     return new Promise((resolve, reject) => {
-        getVideosOfDirectory(relativePath).then((videos) => {
+        getFilesOfDirectory(relativePath).then((files) => {
+            const videos = files.filter(({ type }) => type === "video");
             let promises: Array<Promise<any>> = [];
 
             videos.forEach((video) => {

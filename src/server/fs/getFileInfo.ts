@@ -18,7 +18,7 @@ export default function getFileInfo(db: Database, hash: string) : Promise<IFileI
         const mimeType = mime.lookup(data.path) as string;
 
         if (supportedMimeTypes.indexOf(mimeType) !== -1) {
-            thumb = path.join(process.env.THUMBNAIL_LOCATION as string, hash + ".jpg").replace(/\\+|\/+/g, '/');
+            thumb = hash + ".jpg";
         }
 
         getFileStats(data.path).then((stats) => {
