@@ -15,6 +15,8 @@ import Caching from "./lib/Caching";
 import logger from "./logger";
 import { normalizePathParam, toAbsolutePath } from "./utils";
 
+let ALREADY_GENERATING_THUMBS = false;
+
 //#region optional dependencies
 let VIDEO_THUMBNAILS = false;
 let generateVideoThumbsOfWholeDirectory = (noop: string) => new Promise<any>(r => r(void 0));
@@ -165,24 +167,16 @@ app.get("/api/getFileInfo", (req, res) => {
     });
 });
 
-/*
-app.get("/api/getImages", (req, res) => {
-    const path = req.query.path as string;
-
-    getImagesOfDirectory(path)
-    .then((info) => {
-        res.status(200).send(info);
-    })
-    .catch((error) => {
-        logger.error(error);
-        
-        res.status(400).send(error);
-    });
-});
-*/
-
 app.get("/api/generateThumbsForDirectory", (req, res) => {
     const path = req.query.path as string;
+
+    // Prevents ffmpeg from r*ping all system resources
+    if (ALREADY_GENERATING_THUMBS) {
+        logger.info("Page access: Server is too busy generating thumbnails");
+        return void res.status(200).send({ error: false, message: "Server is too busy generating thumbnails. Slowdowns are expected and some thumbs may not be shown." });
+    }
+
+    ALREADY_GENERATING_THUMBS = true;
 
     Promise.all([
         generateThumbsOfWholeDirectory(path),
@@ -194,7 +188,9 @@ app.get("/api/generateThumbsForDirectory", (req, res) => {
     .catch((error) => {
         logger.error(error);
 
-        res.status(500).send(error);
+        res.status(500).send({ error: true, message: error?.message || error });
+    }).finally(() => {
+        ALREADY_GENERATING_THUMBS = false;
     });
 });
 

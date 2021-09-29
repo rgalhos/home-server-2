@@ -78,6 +78,8 @@ const VideoItem = ({ video }: { video: IFileInfo} ) => {
                     ref={ref}
                     width="100%"
                     height="100%"
+                    preload="none"
+                    poster={"/~thumbs/" + video.hash + "_poster.jpg"}
                 >
                     <source
                         src={"/~thumbs/" + video.hash + ".mp4"}

@@ -5,11 +5,14 @@ import generateVideoThumb from "./generateVideoThumb";
 import logger from "../logger";
 import { toAbsolutePath } from "../utils";
 import getFilesOfDirectory from "../fs/getFilesOfDirectory";
+import { getSkipThumbList } from "../fs/noThumb";
 
 export default function generateVideoThumbsOfWholeDirectory(relativePath: string) : Promise<any> {
     return new Promise((resolve, reject) => {
         getFilesOfDirectory(relativePath).then((files) => {
-            const videos = files.filter(({ type }) => type === "video");
+            const skipList = getSkipThumbList();
+            const videos = files.filter(({ type, hash }) => type === "video" && skipList.indexOf(hash) === -1);
+
             let promises: Array<Promise<any>> = [];
 
             videos.forEach((video) => {

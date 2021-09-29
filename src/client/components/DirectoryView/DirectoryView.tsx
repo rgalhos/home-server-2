@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 
-import { CircularProgress, Container } from "@material-ui/core";
+import { CircularProgress, Container, Snackbar } from "@material-ui/core";
 import FolderList from "./FolderList/FolderList";
 import FileList from "./FileList/FileList";
 import ImageList from "./ImageList/ImageList";
@@ -9,6 +9,7 @@ import VideoList from "./VideoList/VideoList";
 import IFileInfo from "../../../common/interfaces/IFileInfo";
 import IFolderOverview from "../../../common/interfaces/IFolderOverview";
 import SwipeableDrawerDirectory from "./SwipeableDrawerDirectory";
+import { Alert } from "@material-ui/lab";
 
 interface States {
     path: string,
@@ -18,6 +19,7 @@ interface States {
     videoList: null | IFileInfo[],
     error: boolean,
     errorMessage: string,
+    infoSnackbar: string,
 };
 
 class DirectoryView extends React.Component<{}, States> {
@@ -33,6 +35,7 @@ class DirectoryView extends React.Component<{}, States> {
             videoList: null,
             error: false,
             errorMessage: "",
+            infoSnackbar: "",
         };
 
         this.changeDirectory = this.changeDirectory.bind(this);
@@ -120,10 +123,11 @@ class DirectoryView extends React.Component<{}, States> {
                 path: this.state.path,
             },
         }).then(({ data }) => {
+            console.dir(data);
             this.setState({
-                fileList: data.filter((file: any) => file.type === "file" || data.thumbnail === null),
+                fileList: data.filter((file: any) => file.type === "file" || file.thumbnail === null),
                 imageList: data.filter((file: any) => file.type === "image" && !!file.thumbnail),
-                videoList: data.filter((file: any) => file.type === "video" && !!file.thumbnail),
+                videoList: data.filter((file: any) => file.type === "video" && !!file.thumbnail).slice(0, 50),
             }, cb);
         }).catch((error) => {
             console.error(error);
@@ -143,7 +147,15 @@ class DirectoryView extends React.Component<{}, States> {
                 path: this.state.path,
             },
         })
-        .then(cb)
+        .then(({ data }) => {
+            if (!data.error && data.message) {
+                this.setState({
+                    infoSnackbar: data.message,
+                });
+            }
+
+            cb();
+        })
         .catch((error) => {
             console.error(error);
             
@@ -164,8 +176,22 @@ class DirectoryView extends React.Component<{}, States> {
                 </div>
             );
         } else {
+            let snackbar = ( <></> );
+
+            if (this.state.infoSnackbar) {
+                snackbar = (
+                    <Snackbar anchorOrigin={{ vertical: "top", horizontal: "center" }} open={true}>
+                        <Alert severity="warning">
+                            {this.state.infoSnackbar}
+                        </Alert>
+                    </Snackbar>  
+                );
+            }
+
             contents = (
                 <>
+                    {snackbar}
+
                     <FolderList
                         path={this.state.path}
                         folderList={this.state.folderList}
