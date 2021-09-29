@@ -1,6 +1,8 @@
 import * as path from "path";
 import sharp from "sharp";
 import * as mime from "mime-types";
+import { addToSkipThumbList } from "../fs/noThumb";
+import logger from "../logger";
 
 const supportedMimeTypes = [
     "image/jpeg",
@@ -14,7 +16,7 @@ const supportedMimeTypes = [
 
 export { supportedMimeTypes };
 
-export default function generateThumb(input: string, output: string) : Promise<sharp.OutputInfo> {
+export default function generateThumb(input: string, hash: string) : Promise<sharp.OutputInfo | void> {
     return new Promise((resolve, reject) => {
         if (supportedMimeTypes.indexOf(mime.lookup(input) as string) === -1) {
             return reject(new Error("mime type not supported"));
@@ -23,8 +25,14 @@ export default function generateThumb(input: string, output: string) : Promise<s
         sharp(input)
             .resize(192, 192)
             .jpeg()
-            .toFile(path.join(process.env.THUMBNAIL_LOCATION as string, output + ".jpg"))
+            .toFile(path.join(process.env.THUMBNAIL_LOCATION as string, hash + ".jpg"))
         .then(resolve)
-        .catch(reject);
+        .catch((error) => {
+            logger.error(error + " [" + hash + "]");
+
+            addToSkipThumbList(hash);
+
+            resolve();
+        });
     });
 }

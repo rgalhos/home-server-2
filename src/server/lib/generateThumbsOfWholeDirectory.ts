@@ -6,11 +6,13 @@ import generateThumb from "./generateThumb";
 //import getImagesOfDirectory from "../fs/_getImagesOfDirectory";
 import logger from "../logger";
 import getFilesOfDirectory from "../fs/getFilesOfDirectory";
+import { getSkipThumbList } from "../fs/noThumb";
 
 export default function generateThumbsOfWholeDirectory(relativePath: string) : Promise<any> {
     return new Promise((resolve, reject) => {
         getFilesOfDirectory(relativePath).then((files) => {
-            const images = files.filter(({ type }) => type === "image");
+            const skipList = getSkipThumbList();
+            const images = files.filter(({ type, hash }) => type === "image" && skipList.indexOf(hash) === -1);
             let promises: Array<Promise<any>> = [];
 
             images.forEach((image) => {
