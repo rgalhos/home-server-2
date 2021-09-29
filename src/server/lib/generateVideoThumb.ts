@@ -3,14 +3,12 @@ import * as path from "path";
 import * as crypto from "crypto";
 import { tmpdir } from "os";
 import Ffmpeg from "fluent-ffmpeg";
-import getVideoDurationInSeconds from "get-video-duration";
 import logger from "../logger";
 
 const NO_THUMBNAILS = 5;
 
 export default function generateVideoThumb(absoluteFilePath: string, output: string) : Promise<void> {
     return new Promise((resolve, reject) => {
-        //getVideoDurationInSeconds(absoluteFilePath).then((duration) => {
         Ffmpeg.ffprobe(absoluteFilePath, (err, data) => {
             if (err) {
                 return reject(err);

@@ -3,7 +3,6 @@ import * as path from "path";
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 import generateVideoThumb from "./generateVideoThumb";
 import logger from "../logger";
-//import getVideosOfDirectory from "../fs/getVideosOfDirectory";
 import { toAbsolutePath } from "../utils";
 import getFilesOfDirectory from "../fs/getFilesOfDirectory";
 

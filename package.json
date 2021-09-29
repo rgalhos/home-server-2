@@ -18,8 +18,7 @@
     "winston": "^3.3.3"
   },
   "optionalDependencies": {
-    "fluent-ffmpeg": "^2.1.2",
-    "get-video-duration": "^4.0.0"
+    "fluent-ffmpeg": "^2.1.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.14.1",
