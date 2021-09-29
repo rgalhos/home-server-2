@@ -1,6 +1,6 @@
 import React from "react";
 import { getImageSorting } from "../../../utils/session";
-import { Box, ImageList as ImageListBox, ImageListItem, Link } from '@material-ui/core';
+import { Box, ImageList as ImageListBox, ImageListItem, Link } from '@mui/material';
 import IFileInfo from "../../../../common/interfaces/IFileInfo";
 
 interface ImageListProps {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Breadcrumbs, Typography, Link } from '@material-ui/core';
+import { Breadcrumbs, Typography, Link } from '@mui/material';
 
 interface NavigationBreadcrumbProps {
     changeDirectory?: (dir: string) => void,

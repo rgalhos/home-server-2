@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 
-import { CircularProgress, Container, Snackbar } from "@material-ui/core";
+import { Alert, CircularProgress, Container, Snackbar } from "@mui/material";
 import FolderList from "./FolderList/FolderList";
 import FileList from "./FileList/FileList";
 import ImageList from "./ImageList/ImageList";
@@ -9,7 +9,6 @@ import VideoList from "./VideoList/VideoList";
 import IFileInfo from "../../../common/interfaces/IFileInfo";
 import IFolderOverview from "../../../common/interfaces/IFolderOverview";
 import SwipeableDrawerDirectory from "./SwipeableDrawerDirectory";
-import { Alert } from "@material-ui/lab";
 
 interface States {
     path: string,

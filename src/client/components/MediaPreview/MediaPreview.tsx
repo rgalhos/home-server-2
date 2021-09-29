@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 
 import * as mime from "../../utils/mimeTypes";
-import { Box, CircularProgress, Container } from "@material-ui/core";
+import { Box, CircularProgress, Container } from "@mui/material";
 import { withRouter } from "react-router-dom";
 import MediaPreviewInfo, { IMediaPreviewInfo } from "./MediaPreviewInfo/MediaPreviewInfo";
 import MediaPreviewControllers from "./MediaPreviewControllers/MediaPreviewControllers";

@@ -1,11 +1,11 @@
 import React from "react";
-import { Box, BottomNavigation, BottomNavigationAction } from "@material-ui/core";
+import { Box, BottomNavigation, BottomNavigationAction } from "@mui/material";
 import { IMediaPreviewInfo } from "../../MediaPreviewInfo/MediaPreviewInfo";
-import GetAppIcon from '@material-ui/icons/GetApp';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import CameraEnhanceIcon from "@material-ui/icons/CameraEnhance";
-import FastForwardIcon from '@material-ui/icons/FastForward';
-import AccessTimeIcon from '@material-ui/icons/AccessTime';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import CameraEnhanceIcon from "@mui/icons-material/CameraEnhance";
+import FastForwardIcon from '@mui/icons-material/FastForward';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { newMediaSession } from "../../../../utils/videoMediaControl";
 
 interface IVideoControllerProps {

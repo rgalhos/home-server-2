@@ -1,8 +1,8 @@
-import { createTheme } from "@material-ui/core/styles";
+import { createTheme } from "@mui/material/styles";
 
 const darkTheme = createTheme({
     palette: {
-        type: "dark",
+        mode: "dark",
         primary: {
             "600": "#5725b4",
             main: "#794BC4", // "rgb(121, 75, 196)",
@@ -11,8 +11,8 @@ const darkTheme = createTheme({
             "100": "#d0c0e9",
         },
         background: {
-            //default: "rgb(21, 32, 43)",
-            //default: "rgb(0, 0, 0, .88)",
+            // default: "rgb(21, 32, 43)",
+            // default: "rgb(0, 0, 0, .88)",
             default: "#121212",
         }
     }

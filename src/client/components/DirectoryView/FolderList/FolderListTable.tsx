@@ -1,7 +1,7 @@
 import React from "react";
 
-import { Link, ListItem, ListItemAvatar, Avatar, ListItemText, List } from "@material-ui/core";
-import FolderIcon from '@material-ui/icons/Folder';
+import { Link, ListItem, ListItemAvatar, Avatar, ListItemText, List } from "@mui/material";
+import FolderIcon from '@mui/icons-material/Folder';
 import { bytesToSizeString } from "../../../utils/utils";
 import IFolderOverview from "../../../../common/interfaces/IFolderOverview";
 

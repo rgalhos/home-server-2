@@ -1,8 +1,7 @@
 import React from "react";
 import axios from "axios";
-import { Container, CircularProgress, Button } from "@material-ui/core";
-import { Alert, AlertTitle } from "@material-ui/lab";
-import HistoryIcon from '@material-ui/icons/History';
+import { Alert, AlertTitle, Container, CircularProgress, Button } from "@mui/material";
+import HistoryIcon from '@mui/icons-material/History';
 import NavigationBreadcrumb from "../DirectoryView/NavigationBreadcrumb/NavigationBreadcrumb";
 import UploadForm from "./UploadForm";
 

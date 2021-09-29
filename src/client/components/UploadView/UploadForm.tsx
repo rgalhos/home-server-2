@@ -1,8 +1,7 @@
-import { Box, Button, Container, FormControl, LinearProgress } from "@material-ui/core";
-import { Alert, AlertTitle } from "@material-ui/lab";
+import { Alert, AlertTitle, Box, Button, Container, FormControl, LinearProgress } from "@mui/material";
 import UploadFileListPreview from "./UploadFileListPreview";
-import CloudUploadIcon from '@material-ui/icons/CloudUpload';
-import FolderOpenIcon from '@material-ui/icons/FolderOpen';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import React from "react";
 import axios from "axios";
 

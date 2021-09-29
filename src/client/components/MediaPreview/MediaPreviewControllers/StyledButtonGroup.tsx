@@ -1,7 +1,7 @@
-import { withStyles, Theme, createStyles } from '@material-ui/core/styles';
-import { ButtonGroup } from "@material-ui/core";
+import { withStyles, createStyles } from "@material-ui/styles";
+import { ButtonGroup } from "@mui/material";
 
-const StyledButtonGroup = withStyles((theme: Theme) =>
+const StyledButtonGroup = withStyles((theme: any) =>
     createStyles({
         root: {
             display: "flex",

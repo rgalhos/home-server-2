@@ -4,23 +4,23 @@
   "private": true,
   "proxy": "http://localhost:8099/",
   "dependencies": {
-    "@material-ui/core": "^4.12.3",
-    "@material-ui/icons": "^4.11.2",
-    "@material-ui/lab": "^4.0.0-alpha.60",
     "axios": "^0.21.1",
     "base-58": "0.0.1",
     "better-sqlite3": "^7.4.3",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "fluent-ffmpeg": "^2.1.2",
     "formidable": "^1.2.2",
     "mime-types": "^2.1.32",
     "sharp": "^0.28.3",
     "winston": "^3.3.3"
   },
-  "optionalDependencies": {
-    "fluent-ffmpeg": "^2.1.2"
-  },
   "devDependencies": {
+    "@emotion/react": "^11.4.1",
+    "@emotion/styled": "^11.3.0",
+    "@material-ui/styles": "^4.11.4",
+    "@mui/icons-material": "^5.0.1",
+    "@mui/material": "^5.0.2",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",

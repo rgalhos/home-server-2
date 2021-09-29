@@ -1,10 +1,10 @@
 import React from "react";
-import { List, ListItem, ListItemIcon, ListItemText, Switch, SwipeableDrawer, ListItemSecondaryAction, ListSubheader, Link, SwipeableDrawerProps, AppBar, IconButton, Toolbar } from "@material-ui/core";
-import DeleteIcon from '@material-ui/icons/Delete';
-import MenuIcon from '@material-ui/icons/Menu';
-import NightsStayIcon from '@material-ui/icons/NightsStay';
-import WbSunnyIcon from '@material-ui/icons/WbSunny';
-import BackupIcon from '@material-ui/icons/Backup';
+import { List, ListItem, ListItemIcon, ListItemText, Switch, SwipeableDrawer, ListItemSecondaryAction, ListSubheader, Link, SwipeableDrawerProps, AppBar, IconButton, Toolbar } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import MenuIcon from '@mui/icons-material/Menu';
+import NightsStayIcon from '@mui/icons-material/NightsStay';
+import WbSunnyIcon from '@mui/icons-material/WbSunny';
+import BackupIcon from '@mui/icons-material/Backup';
 import { getUserTheme, setUserTheme } from "../../utils/session";
 
 interface SwipeableDrawerDirectoryProps {

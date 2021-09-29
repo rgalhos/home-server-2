@@ -1,9 +1,9 @@
 import React from "react";
-import { Box, BottomNavigation, BottomNavigationAction, Button } from "@material-ui/core";
+import { Box, BottomNavigation, BottomNavigationAction, Button } from "@mui/material";
 import { IMediaPreviewInfo } from "../../MediaPreviewInfo/MediaPreviewInfo";
 import StyledButtonGroup from "../StyledButtonGroup";
-import GetAppIcon from '@material-ui/icons/GetApp';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 interface IImageControllerProps {
     info: IMediaPreviewInfo,

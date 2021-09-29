@@ -1,8 +1,8 @@
 import React from "react";
-import { Box, BottomNavigation, BottomNavigationAction } from "@material-ui/core";
+import { Box, BottomNavigation, BottomNavigationAction } from "@mui/material";
 import { IMediaPreviewInfo } from "../../MediaPreviewInfo/MediaPreviewInfo";
-import GetAppIcon from '@material-ui/icons/GetApp';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 interface UnsupportedFormatControllerProps {
     info: IMediaPreviewInfo,

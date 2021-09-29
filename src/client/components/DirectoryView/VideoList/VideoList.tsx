@@ -1,8 +1,7 @@
 import React from "react";
-import { Box, ImageList as ImageListBox, ImageListItem, ImageListItemBar, Link } from '@material-ui/core';
+import { Box, Pagination, ImageList as ImageListBox, ImageListItem, ImageListItemBar, Link } from "@mui/material";
 import IFileInfo from "../../../../common/interfaces/IFileInfo";
 import { isOnMobile } from "../../../utils/utils";
-import { Pagination } from "@material-ui/lab";
 
 interface VideoListProps {
     path: string,
@@ -56,13 +55,15 @@ export default class VideoList extends React.Component<VideoListProps, VideoList
 
         return (
             <Box id="video-list">
-                <ImageListBox rowHeight={50} cols={4} style={{ justifyContent: "space-between", margin: "0 2px" }}>
+                <ImageListBox cols={isOnMobile() ? 2 : 4} style={{ justifyContent: "space-between", margin: "0 2px" }}>
                     {thumbs}
                 </ImageListBox>
 
-                <Box style={{ display: "flex", justifyContent: "center" }}>
-                    <Pagination count={this.maxPages} page={this.state.page} color="primary" size="large" onChange={this.changePage} showFirstButton showLastButton />
-                </Box>
+                {this.maxPages > 1 && (
+                    <Box style={{ display: "flex", justifyContent: "center", marginTop: "12px" }}>
+                        <Pagination count={this.maxPages} page={this.state.page} color="primary" size="large" onChange={this.changePage} showFirstButton showLastButton />
+                    </Box>
+                )}
             </Box>
         );
     }
@@ -82,17 +83,9 @@ function stopVideo({ current: video }: { current: HTMLVideoElement | null }) {
 const VideoItem = ({ video }: { video: IFileInfo} ) => {
     const ref: React.Ref<HTMLVideoElement> = React.useRef<HTMLVideoElement>(null);
 
-    let size = isOnMobile() ? '50%' : '25%';
-
-    const style = {
-        width: `calc(${size} - 4px)`,
-        height: `calc(${size} - 4px)`
-    };
-
     return (
         <ImageListItem
             data-hash={video.hash}
-            style={style}
             onTouchStart={() => playVideo(ref) }
             onTouchEnd={ () => stopVideo(ref) }
             onMouseOver={ () => playVideo(ref) }

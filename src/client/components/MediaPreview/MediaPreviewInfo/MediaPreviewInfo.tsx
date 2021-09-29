@@ -1,13 +1,12 @@
-import React from "react";
-
-import { Box, List, ListItem, ListItemAvatar, Avatar, ListItemText, Divider, ListSubheader, Theme, makeStyles, createStyles } from "@material-ui/core";
+import { Box, List, ListItem, ListItemAvatar, Avatar, ListItemText, Divider, ListSubheader, Theme } from "@mui/material";
+import { createStyles, makeStyles } from "@material-ui/styles";
 import IFileInfo from "../../../../common/interfaces/IFileInfo";
 import { bytesToSizeString } from "../../../utils/utils";
-import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
-import DeveloperModeIcon from '@material-ui/icons/DeveloperMode';
-import AddIcon from '@material-ui/icons/Add';
-import CreateIcon from '@material-ui/icons/Create';
-import AccessTimeIcon from '@material-ui/icons/AccessTime';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
+import AddIcon from '@mui/icons-material/Add';
+import CreateIcon from '@mui/icons-material/Create';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 interface MediaPreviewInfoProps {
     info: IMediaPreviewInfo,

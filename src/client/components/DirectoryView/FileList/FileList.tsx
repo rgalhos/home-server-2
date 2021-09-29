@@ -1,16 +1,16 @@
 import React from "react";
 
 import * as mime from "mime-types";
-import { Link, List, ListItem, ListItemAvatar, Avatar, ListItemText } from "@material-ui/core";
+import { Link, List, ListItem, ListItemAvatar, Avatar, ListItemText } from "@mui/material";
 import { bytesToSizeString } from "../../../utils/utils";
 import IFileInfo from "../../../../common/interfaces/IFileInfo";
 import { getFilesSorting } from "../../../utils/session";
-import MovieCreationIcon from '@material-ui/icons/MovieCreation';
-import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
-import DescriptionIcon from '@material-ui/icons/Description';
-import ArchiveIcon from '@material-ui/icons/Archive';
-import CodeIcon from '@material-ui/icons/Code';
-import AdbIcon from '@material-ui/icons/Adb';
+import MovieCreationIcon from '@mui/icons-material/MovieCreation';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import DescriptionIcon from '@mui/icons-material/Description';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import CodeIcon from '@mui/icons-material/Code';
+import AdbIcon from '@mui/icons-material/Adb';
 import * as mimeUtils from "../../../utils/mimeTypes"
 
 interface FileListProps {
