@@ -1,5 +1,4 @@
 import React from "react";
-import { getImageSorting } from "../../../utils/session";
 import { Box, ImageList as ImageListBox, ImageListItem, Link } from '@mui/material';
 import IFileInfo from "../../../../common/interfaces/IFileInfo";
 
@@ -8,39 +7,13 @@ interface ImageListProps {
     imageList: IFileInfo[],
 };
 
-export default class ImageList extends React.Component<ImageListProps, {}> {
-    imageList: ImageListProps["imageList"];
-
-    constructor(props: ImageListProps) {
-        super(props);
-
-        this.imageList = this.props.imageList;
-
-        let sorting = getImageSorting();
-        
-        if (sorting !== "name") {
-            let sortingFn: (a: IFileInfo, b: IFileInfo) => number = (a, b) => 0;
-
-            if (sorting === "created_asc") {
-                sortingFn = (a, b) => a.created - b.created;
-            } else if (sorting === "created_desc") {
-                sortingFn = (a, b) => b.created - a.created;
-            } else if (sorting === "modified_asc") {
-                sortingFn = (a, b) => a.lastModified - b.lastModified;
-            } else if (sorting === "modified_desc") {
-                sortingFn = (a, b) => b.lastModified - a.lastModified;
-            }
-
-            this.imageList = this.imageList.sort(sortingFn);
-        }
-    }
-
+export default class ImageList extends React.Component<ImageListProps> {
     render() {
-        if (this.imageList.length === 0) {
+        if (this.props.imageList.length === 0) {
             return ( <></> );
         }
 
-        let thumbs = this.imageList
+        let thumbs = this.props.imageList
         .map((image) => (
             <ImageListItem
                 key={image.hash}

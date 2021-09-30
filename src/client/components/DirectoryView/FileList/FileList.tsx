@@ -2,9 +2,8 @@ import React from "react";
 
 import * as mime from "mime-types";
 import { Link, List, ListItem, ListItemAvatar, Avatar, ListItemText } from "@mui/material";
-import { bytesToSizeString } from "../../../utils/utils";
+import { bytesToSizeString, isOnMobile } from "../../../utils/utils";
 import IFileInfo from "../../../../common/interfaces/IFileInfo";
-import { getFilesSorting } from "../../../utils/session";
 import MovieCreationIcon from '@mui/icons-material/MovieCreation';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -62,26 +61,7 @@ export default class FileList extends React.Component<FileListProps, {}> {
             return ( <></> );
         }
 
-        // Sort by name
-        var sortingFn : (a: IFileInfo, b: IFileInfo) => number = (a, b) => (
-            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
-        );
-
-        let sorting = getFilesSorting();
-
-        if (sorting === "created_asc") {
-            sortingFn = (a, b) => a.created - b.created;
-        } else if (sorting === "created_desc") {
-            sortingFn = (a, b) => b.created - a.created;
-        } else if (sorting === "size_asc") {
-            sortingFn = (a, b) => a.size - b.size;
-        } else if (sorting === "size_desc") {
-            sortingFn = (a, b) => b.size - a.size;
-        }
-
         let rows = this.props.files
-        // @ts-ignore
-        .sort(sortingFn)
         .map((file) => {
             file.path = '/' + file.path;
             return file;
@@ -98,7 +78,7 @@ export default class FileList extends React.Component<FileListProps, {}> {
         ));
 
         return (
-            <List dense={true}>
+            <List dense={true} style={{ overflowX: isOnMobile() ? "scroll" : "hidden" }}>
                 {rows}
             </List>
         );

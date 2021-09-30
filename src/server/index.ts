@@ -14,6 +14,8 @@ import directoryExists from "./fs/directoryExists";
 import Caching from "./lib/Caching";
 import logger from "./logger";
 import { normalizePathParam, toAbsolutePath } from "./utils";
+import { applyFilters, normalizeSearchQuery } from "../common/filteringAndSorting";
+import ISearchFilter from "../common/interfaces/ISearchFilters";
 
 let ALREADY_GENERATING_THUMBS = false;
 
@@ -141,16 +143,34 @@ app.get("/api/getFolders", (req, res) => {
 
 app.get("/api/getFiles", (req, res) => {
     const path = req.query.path as string;
+    let filters: ISearchFilter = {};
 
-    getFilesOfDirectory(path)
-    .then((folders) => {
-        res.status(200).send(folders);
-    })
-    .catch((error) => {
-        logger.error(error);
-        
-        res.status(500).send(error);
-    });
+    try {
+        filters = JSON.parse(req.query.filters as string);
+    } catch (e) {
+        // no op
+    } finally {
+        getFilesOfDirectory(path)
+        .then((files) => {
+            res.status(200).send(applyFilters(files, filters));
+        })
+        .catch((error) => {
+            logger.error("/api/getFiles - " + error);
+
+            // Probably invalid regexp in filter
+            if (error instanceof SyntaxError) {
+                return void res.status(400).send({
+                    error: true,
+                    message: error.message,
+                });
+            }
+            
+            res.status(500).send({
+                error: true,
+                message: error?.message || error
+            });
+        });
+    }
 });
 
 app.get("/api/getFileInfo", (req, res) => {

@@ -1,3 +1,5 @@
+import ESortingOptions from "../../common/interfaces/ESortingOptions";
+
 const storage = window.localStorage;
 export { storage };
 
@@ -7,6 +9,7 @@ const defaultConfigs = {
     theme: "dark",
     sortImagesBy: "modified_desc",
     sortFilesBy: "name",
+    sortVideosBy: "name",
     sortDirectoriesBy: "name",
 };
 
@@ -27,28 +30,37 @@ export function check(s?: { prefersDarkMode?: boolean }) {
     }
 }
 
-export function getImageSorting() {
+export function getImageSorting() : ESortingOptions {
     let s = storage.getItem("sortImagesBy") as string;
-    let valid = [ "created_asc", "created_desc", "modified_asc", "modified_desc", "name" ];
-    if (valid.indexOf(s) === -1) {
+    if (!Object.values(ESortingOptions).includes(s)) {
         storage.setItem("sortImagesBy", s = defaultConfigs.sortImagesBy);
     }
-    return s;
+    // @ts-ignore
+    return ESortingOptions[s];
 }
 
-export function getFilesSorting() {
+export function getFilesSorting() : ESortingOptions {
     let s = storage.getItem("sortFilesBy") as string;
-    let valid = [ "created_asc", "created_desc", "name", "size_asc", "size_desc" ];
-    if (valid.indexOf(s) === -1) {
+    if (!Object.values(ESortingOptions).includes(s)) {
         storage.setItem("sortFilesBy", s = defaultConfigs.sortFilesBy);
     }
-    return s;
+    // @ts-ignore
+    return ESortingOptions[s];
+}
+
+export function getVideoSorting() : ESortingOptions {
+    let s = storage.getItem("sortVideosBy") as string;
+    if (!Object.values(ESortingOptions).includes(s)) {
+        storage.setItem("sortVideosBy", s = defaultConfigs.sortVideosBy);
+    }
+    // @ts-ignore
+    return ESortingOptions[s];
 }
 
 export function getUserTheme() {
     let s = storage.getItem("theme") as string;
     if (THEME_LIST.indexOf(s) === -1) {
-        storage.setItem("sortFilesBy", s = defaultConfigs.theme);
+        storage.setItem("theme", s = defaultConfigs.theme);
     }
     return s;
 }

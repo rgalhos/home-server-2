@@ -5,15 +5,20 @@ import MenuIcon from '@mui/icons-material/Menu';
 import NightsStayIcon from '@mui/icons-material/NightsStay';
 import WbSunnyIcon from '@mui/icons-material/WbSunny';
 import BackupIcon from '@mui/icons-material/Backup';
+import SearchBar from "./SearchBar";
 import { getUserTheme, setUserTheme } from "../../utils/session";
 
 interface SwipeableDrawerDirectoryProps {
     path: string,
+    onSearchSubmit: (query: string) => void,
 };
 
 export default function SwipeableDrawerDirectory(props: SwipeableDrawerDirectoryProps) {
     const [ isOpen, setOpen ] = React.useState(false);
     const [ isDarkMode, _toggleDarkMode ] = React.useState(getUserTheme() === "dark");
+
+    // 1280 (max container width) + 225*2 (225 = drawer width) - 30 (padding)
+    const drawerAlwaysVisible = window.innerWidth >= 1700;
 
     function toggleDarkMode() {
         let darkModeNow = !isDarkMode;
@@ -36,9 +41,15 @@ export default function SwipeableDrawerDirectory(props: SwipeableDrawerDirectory
         setOpen(true);
     }
 
+    const searchBar = (
+        <SearchBar onSubmit={props.onSearchSubmit} />
+    );
+
     const list = (
         <div role="presentation">
             <List>
+                { drawerAlwaysVisible && searchBar }
+
                 <ListItem button component={Link} color="inherit" href="/$bin">
                     <ListItemIcon><DeleteIcon /></ListItemIcon>
                     <ListItemText>Bin</ListItemText>
@@ -73,8 +84,7 @@ export default function SwipeableDrawerDirectory(props: SwipeableDrawerDirectory
     let drawerVariant: SwipeableDrawerProps["variant"];
     let appBar = ( <></> );
 
-    // 1280 (max container width) + 225*2 (225 = drawer width) - 30 (padding)
-    if (window.innerWidth >= 1700) {
+    if (drawerAlwaysVisible) {
         drawerVariant = "permanent"
     } else {
         drawerVariant = "temporary";
@@ -85,6 +95,8 @@ export default function SwipeableDrawerDirectory(props: SwipeableDrawerDirectory
                     <IconButton color="inherit" onClick={toggleDrawer} edge="start">
                         <MenuIcon /> 
                     </IconButton>
+
+                    {searchBar}
                 </Toolbar>
             </AppBar>
         );
@@ -107,4 +119,3 @@ export default function SwipeableDrawerDirectory(props: SwipeableDrawerDirectory
         </>
     )
 }
-

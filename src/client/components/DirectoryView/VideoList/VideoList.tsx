@@ -15,21 +15,13 @@ interface VideoListStates {
 const VIDEOS_PER_PAGE = 48; // Multiple of 4
 
 export default class VideoList extends React.Component<VideoListProps, VideoListStates> {
-    videoList: VideoListProps["videoList"];
     maxPages: number;
 
     constructor(props: VideoListProps) {
         super(props);
 
-        this.state = {
-            page: 1,
-        };
-
-        this.videoList = this.props.videoList.sort((a, b) =>
-            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
-        );
-
-        this.maxPages = Math.ceil(this.videoList.length / VIDEOS_PER_PAGE);
+        this.maxPages = Math.ceil(this.props.videoList.length / VIDEOS_PER_PAGE);
+        this.state = { page: 1 };
 
         this.changePage = this.changePage.bind(this);
     }
@@ -42,16 +34,19 @@ export default class VideoList extends React.Component<VideoListProps, VideoList
     }
 
     render() {
-        if (this.videoList.length === 0) {
+        if (this.props.videoList.length === 0) {
             return ( <></> );
         }
 
-        let thumbs = this.videoList.slice((this.state.page - 1) * VIDEOS_PER_PAGE, this.state.page * VIDEOS_PER_PAGE).map((video) => (
-            <VideoItem
-                video={video}
-                key={video.hash}
-            />
-        ));
+        let thumbs = this.props.videoList
+            .slice((this.state.page - 1) * VIDEOS_PER_PAGE, this.state.page * VIDEOS_PER_PAGE)
+            .map((video) => (
+                <VideoItem
+                    video={video}
+                    key={video.hash}
+                />
+            )
+        );
 
         return (
             <Box id="video-list">

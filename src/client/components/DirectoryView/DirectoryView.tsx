@@ -1,24 +1,27 @@
 import React from "react";
 import axios from "axios";
 
-import { Alert, CircularProgress, Container, Snackbar } from "@mui/material";
+import { Alert, CircularProgress, Container } from "@mui/material";
 import FolderList from "./FolderList/FolderList";
 import FileList from "./FileList/FileList";
 import ImageList from "./ImageList/ImageList";
 import VideoList from "./VideoList/VideoList";
 import IFileInfo from "../../../common/interfaces/IFileInfo";
 import IFolderOverview from "../../../common/interfaces/IFolderOverview";
+import ISearchFilters from "../../../common/interfaces/ISearchFilters";
 import SwipeableDrawerDirectory from "./SwipeableDrawerDirectory";
+import { getFilesSorting, getImageSorting, getVideoSorting } from "../../utils/session";
 
 interface States {
     path: string,
+    rawFileList: null | IFileInfo[],
     fileList: null | IFileInfo[],
     folderList: null | IFolderOverview[],
     imageList: null | IFileInfo[],
     videoList: null | IFileInfo[],
     error: boolean,
     errorMessage: string,
-    infoSnackbar: string,
+    infoAlert: string,
 };
 
 class DirectoryView extends React.Component<{}, States> {
@@ -28,13 +31,14 @@ class DirectoryView extends React.Component<{}, States> {
         this.state = {
             // Retrieve last location
             path: window.location.hash.substr(1) || '/',
+            rawFileList: null,
             fileList: null,
             folderList: null,
             imageList: null,
             videoList: null,
             error: false,
             errorMessage: "",
-            infoSnackbar: "",
+            infoAlert: "",
         };
 
         this.changeDirectory = this.changeDirectory.bind(this);
@@ -42,6 +46,7 @@ class DirectoryView extends React.Component<{}, States> {
         this.updateFileList = this.updateFileList.bind(this);
         this.generateThumbsForDirectory = this.generateThumbsForDirectory.bind(this);
         this.scanFiles = this.scanFiles.bind(this);
+        this.onSearchSubmit = this.onSearchSubmit.bind(this);
 
         window.onpopstate = (event) => {
             event.preventDefault();
@@ -76,6 +81,12 @@ class DirectoryView extends React.Component<{}, States> {
         });
     }
 
+    onSearchSubmit(query: string) {
+        this.updateFileList(() => { }, {
+            string: query
+        });
+    }
+
     scanFiles(cb: () => void = function noop() { }) {
         axios({
             url: "/api/scanFiles",
@@ -86,8 +97,6 @@ class DirectoryView extends React.Component<{}, States> {
         })
         .then(cb)
         .catch((error) => {
-            console.error(error);
-
             this.setState({
                 error: true,
                 errorMessage: error,
@@ -114,26 +123,33 @@ class DirectoryView extends React.Component<{}, States> {
         });
     }
 
-    updateFileList(cb: () => void = function noop() { }) {
+    updateFileList(cb: () => void = function noop() { }, filters: ISearchFilters = {}) {
+        filters.sort = {
+            file: getFilesSorting(),
+            image: getImageSorting(),
+            video: getVideoSorting(),
+        };
+
         axios({
             url: "/api/getFiles",
             method: "GET",
             params: {
                 path: this.state.path,
+                filters: JSON.stringify(filters),
             },
         }).then(({ data }) => {
-            console.dir(data);
             this.setState({
-                fileList: data.filter((file: any) => file.type === "file" || file.thumbnail === null),
-                imageList: data.filter((file: any) => file.type === "image" && !!file.thumbnail),
-                videoList: data.filter((file: any) => file.type === "video" && !!file.thumbnail),
+                error: false,
+                errorMessage: "",
+                rawFileList: data,
+                fileList: data.files,
+                imageList: data.images,
+                videoList: data.videos,
             }, cb);
         }).catch((error) => {
-            console.error(error);
-            
             this.setState({
                 error: true,
-                errorMessage: error.message,
+                errorMessage: error?.response?.data?.message || error.message,
             });
         });
     }
@@ -147,13 +163,9 @@ class DirectoryView extends React.Component<{}, States> {
             },
         })
         .then(({ data }) => {
-            if (!data.error && data.message) {
-                this.setState({
-                    infoSnackbar: data.message,
-                });
-            }
-
-            cb();
+            this.setState({
+                infoAlert: (!data?.error) ? (data?.message || null) : null,
+            }, cb);
         })
         .catch((error) => {
             console.error(error);
@@ -175,21 +187,19 @@ class DirectoryView extends React.Component<{}, States> {
                 </div>
             );
         } else {
-            let snackbar = ( <></> );
-
-            if (this.state.infoSnackbar) {
-                snackbar = (
-                    <Snackbar anchorOrigin={{ vertical: "top", horizontal: "center" }} open={true}>
-                        <Alert severity="warning">
-                            {this.state.infoSnackbar}
-                        </Alert>
-                    </Snackbar>  
-                );
-            }
-
             contents = (
                 <>
-                    {snackbar}
+                    {this.state.infoAlert && (
+                        <Alert severity="warning">
+                            {this.state.infoAlert}
+                        </Alert>
+                    )}
+
+                    {(this.state.error && this.state.errorMessage) && (
+                        <Alert severity="error">
+                            {this.state.errorMessage}
+                        </Alert>
+                    )}
 
                     <FolderList
                         path={this.state.path}
@@ -218,6 +228,7 @@ class DirectoryView extends React.Component<{}, States> {
             <>
                 <SwipeableDrawerDirectory
                     path={this.state.path}
+                    onSearchSubmit={this.onSearchSubmit}
                 />
                 
                 <Container id="directory-view">
