@@ -1,5 +1,5 @@
 import { Box, List, ListItem, ListItemAvatar, Avatar, ListItemText, Divider, ListSubheader, Theme } from "@mui/material";
-import { createStyles, makeStyles } from "@material-ui/styles";
+import { makeStyles, createStyles } from "@mui/styles";
 import IFileInfo from "../../../../common/interfaces/IFileInfo";
 import { bytesToSizeString } from "../../../utils/utils";
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
