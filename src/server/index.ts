@@ -11,10 +11,9 @@ import Database from "./database";
 import generateThumbsOfWholeDirectory from "./lib/generateThumbsOfWholeDirectory";
 import insertAllFilesIntoDatabase from "./database/insertAllFilesIntoDatabase";
 import directoryExists from "./fs/directoryExists";
-import Caching from "./lib/Caching";
 import logger from "./logger";
 import { normalizePathParam, toAbsolutePath } from "./utils";
-import { applyFilters, normalizeSearchQuery } from "../common/filteringAndSorting";
+import { applyFilters } from "../common/filteringAndSorting";
 import ISearchFilter from "../common/interfaces/ISearchFilters";
 
 let ALREADY_GENERATING_THUMBS = false;
@@ -41,7 +40,6 @@ if (!fs.existsSync(THUMBNAIL_LOCATION)) {
     fs.mkdirSync(THUMBNAIL_LOCATION);
 }
 
-const cache = new Caching();
 const db = new Database("./db.db3");
 const app = express();
 
@@ -50,45 +48,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, "../../build")));
 app.use("/~", express.static(process.env.FILESYSTEM_ROOT as string));
-
-//#region caching
-if (process.env.CACHING === "true") {
-    app.use("/~thumbs/:hash", (req, res, next) => {
-        const hash = req.params.hash;
-
-        if (cache.isThumbCached(hash)) {
-            logger.debug(`Cache hit: We have thumb "${hash}" in memory!`);
-
-            const thumb = cache.getCachedThumb(hash) as Buffer;
-            
-            return void res.writeHead(200, {
-                "Content-Type": "image/jpeg",
-                "Content-Length": thumb.length,
-            })
-            .end(thumb);
-        } else {
-            logger.debug(`Cache miss: We don't have thumb "${hash}" in memory!`);
-
-            cache.storeThumb(hash, hash)
-            .then((thumb) => {
-                logger.debug(`Stored thumb for "${hash}"`);
-
-                return void res.writeHead(200, {
-                    "Content-Type": "image/jpeg",
-                    "Content-Length": thumb.length,
-                })
-                .end(thumb);
-            })
-            .catch(err => {
-                logger.error("Could not get thumbnail from cache: " + (err?.message || "unknown error") + " :: Reading from filesystem...");
-
-                return void next();
-            });
-        }
-    });
-}
-//#endregion caching
-
 app.use("/~thumbs", express.static(THUMBNAIL_LOCATION));
 
 //#region authentication
@@ -297,13 +256,6 @@ app.post("/api/uploadFiles", (req, res) => {
             res.status(500).send({ error: true, message: e.message });
         });
     })
-});
-
-app.get("/api/getEnvironment", (req, res) => {
-    res.status(200).send({
-        videoThumbnails: VIDEO_THUMBNAILS,
-        caching: process.env.CACHING === "true",
-    });
 });
 //#endregion api calls
 

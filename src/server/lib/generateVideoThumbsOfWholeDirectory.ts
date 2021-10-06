@@ -6,6 +6,7 @@ import logger from "../logger";
 import { toAbsolutePath } from "../utils";
 import getFilesOfDirectory from "../fs/getFilesOfDirectory";
 import { getSkipThumbList } from "../fs/noThumb";
+import IFileInfo from "../../common/interfaces/IFileInfo";
 
 export default function generateVideoThumbsOfWholeDirectory(relativePath: string) : Promise<any> {
     return new Promise((resolve, reject) => {
@@ -28,7 +29,7 @@ export default function generateVideoThumbsOfWholeDirectory(relativePath: string
                 );
             });
 
-            Promise.all(promises).then(videosWithNoThumb => {
+            Promise.all(promises).then((videosWithNoThumb: IFileInfo[]) => {
                 videosWithNoThumb = videosWithNoThumb.filter(x => x !== null);
 
                 if (videosWithNoThumb.length === 0) {
@@ -37,26 +38,32 @@ export default function generateVideoThumbsOfWholeDirectory(relativePath: string
                     return;
                 }
 
-                const videoThumbWorker = new Worker(__filename, {
-                    workerData: videosWithNoThumb,
-                });
+                let instances = Number(process.env.CONCURRENT_FFMPEG_INSTANCES) || 1;
+                let videoList = divideVideoList(videosWithNoThumb);
 
-                videoThumbWorker.on("message", (message: any) => {
-                    if (!message.hasOwnProperty("success")) {
-                        logger.error("Received malformed message from videoThumbWorker!");
-                        return void reject(new Error("Received malformed message from videoThumbWorker!"));
-                    }
+                while (instances--) {
+                    if (!videoList[instances])
+                        continue;
+                        
+                    logger.debug("Starting video thumbnail worker #" + instances);
 
-                    if (message.success) {
-                        resolve(message.value);
-                    } else {
-                        reject(message.value);
-                    }
-                });
+                    const videoThumbWorker = new Worker(__filename, {
+                        workerData: videoList[instances],
+                    });
 
-                videoThumbWorker.on("exit", (exitCode) => {
-                    logger.info("Video thumbnail worker has exited. Exit code:", exitCode);
-                });
+                    videoThumbWorker.on("message", (message: any) => {
+                        if (!message.hasOwnProperty("success")) {
+                            logger.error("Received malformed message from videoThumbWorker!");
+                            return void reject(new Error("Received malformed message from videoThumbWorker!"));
+                        }
+
+                        (message.success ? resolve : reject)(message.value);
+                    });
+
+                    videoThumbWorker.on("exit", (exitCode) => {
+                        logger.info("Video thumbnail worker has exited. Exit code:", exitCode);
+                    });
+                }
             }).catch(reject);
         }).catch(reject);
     });
@@ -93,4 +100,17 @@ if (!isMainThread) {
             .catch(sendError)
         ;
     })();
+}
+
+function divideVideoList(arr: IFileInfo[]) : IFileInfo[][] {
+    let max = arr.length / (Number(process.env.CONCURRENT_FFMPEG_INSTANCES) || 1);
+
+    return arr.reduce((resultArr, item, i) => {
+        const chunkIndex = Math.floor(i / max);
+
+        // @ts-ignore
+        resultArr[chunkIndex] = (resultArr[chunkIndex] || []).concat(item);
+
+        return resultArr;
+    }, []);
 }

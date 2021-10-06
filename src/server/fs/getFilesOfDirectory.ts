@@ -7,6 +7,7 @@ import IFileInfo from "../../common/interfaces/IFileInfo";
 import hashFunc from "../lib/hashFunc";
 import { supportedMimeTypes } from "../lib/generateThumb";
 import { toAbsolutePath } from "../utils";
+import getThumbnail from "./getThumbnail";
 
 const supportedVideoMimeTypes = [
     "video/3gpp",
@@ -44,7 +45,6 @@ export default function getFilesOfDirectory(relativePath: string) : Promise<IFil
                     .then((stats) => {
                         const _hash = hashFunc(_path, stats.ctime);
 
-                        let thumb: string | null = null;
                         let type: IFileInfo["type"] = "file";
 
                         if (supportedMimeTypes.indexOf(mime.lookup(file.name) as string) !== -1) {
@@ -53,24 +53,12 @@ export default function getFilesOfDirectory(relativePath: string) : Promise<IFil
                             type = "video";
                         }
 
-                        if (type !== "file") {
-                            let jpgThumb = path.join(process.env.THUMBNAIL_LOCATION as string, _hash + ".jpg");
-                            let mp4Thumb = path.join(process.env.THUMBNAIL_LOCATION as string, _hash + ".mp4");
-
-                            if (fs.existsSync(jpgThumb)) {
-                                thumb = _hash + ".jpg";
-                            } else if (fs.existsSync(mp4Thumb)) {
-                                thumb = _hash + ".mp4";
-                            }
-                        }
-
                         fileList.push({
                             hash: _hash,
                             name: file.name,
                             path: _path,
                             size: stats.size,
-                            // TO DO: rever a lógica das thumbnails e implementar uma lista para ignorar essas checagens
-                            thumbnail: thumb,
+                            thumbnail: getThumbnail(file.name, _hash),
                             accessTime: +stats.atime,
                             lastModified: +stats.mtime,
                             created: +stats.ctime,
