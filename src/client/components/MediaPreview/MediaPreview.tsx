@@ -16,7 +16,7 @@ interface MediaPreviewStates {
     background: string,
 };
 
-export class MediaPreview extends React.Component<any, MediaPreviewStates> {
+class MediaPreview extends React.Component<any, MediaPreviewStates> {
     mediaRef: React.RefObject<any>;
 
     constructor(props: any) {
@@ -103,8 +103,18 @@ export class MediaPreview extends React.Component<any, MediaPreviewStates> {
         } else if (mime.isVideo(info.name)) {
             media = (
                 <Box id="image-box">
-                    <video controls id="video-playback" ref={this.mediaRef} onLoadedMetadata={({ target }: { target: any}) => this.setMediaDimensions({ width: target.videoWidth, height: target.videoHeight })}>
-                        <source src={srcLink} type="video/mp4" />
+                    <video
+                        controls
+                        id="video-playback"
+                        ref={this.mediaRef}
+                        onLoadedMetadata={({ target }: { target: any}) => this.setMediaDimensions({ width: target.videoWidth, height: target.videoHeight })}
+                        poster={"/~thumbs/" + info.hash + "_poster.jpg"}
+                        loop={info.mimeType === "video/webm"}
+                    >
+                        <source
+                            src={srcLink}
+                            type={info.mimeType === "video/x-matroska" ? "video/mp4" : (info.mimeType || "video/mp4")}
+                        />
                     </video>
                 </Box>
             );

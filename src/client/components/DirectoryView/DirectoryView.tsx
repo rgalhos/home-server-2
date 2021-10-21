@@ -24,7 +24,7 @@ interface States {
     infoAlert: string,
 };
 
-class DirectoryView extends React.Component<{}, States> {
+export default class DirectoryView extends React.Component<{}, States> {
     constructor(props: any) {
         super(props);
 
@@ -48,17 +48,38 @@ class DirectoryView extends React.Component<{}, States> {
         this.scanFiles = this.scanFiles.bind(this);
         this.onSearchSubmit = this.onSearchSubmit.bind(this);
 
+        let skipRestoration = !!window.history?.state?.state?.searchQuery;
+
         window.onpopstate = (event) => {
             event.preventDefault();
-            this.changeDirectory(window.location.hash.substr(1) || '/');
+
+            if (skipRestoration) {
+                skipRestoration = false;
+                return;
+            }
+
+            let restoredSearch = event.state?.state?.searchQuery;
+            let filters: ISearchFilters = {};
+
+            if (restoredSearch)
+                filters.string = restoredSearch;
+
+            this.changeDirectory(window.location.hash.substr(1) || '/', filters);
         }
     }
 
     componentDidMount() {
-        this.changeDirectory(this.state.path);
+        let restoredSearch = window.history?.state?.state?.searchQuery;
+        let filters: ISearchFilters = {};
+
+        if (restoredSearch) {
+            filters = { string: restoredSearch };
+        }
+
+        this.changeDirectory(this.state.path, filters);
     }
 
-    changeDirectory(path: string) {
+    changeDirectory(path: string, filters: ISearchFilters = {}) {
         path = path.replace(/\\+|\/+/g, '/');
         path = path || '/';
 
@@ -74,7 +95,7 @@ class DirectoryView extends React.Component<{}, States> {
             this.scanFiles(() => {
                 this.updateFolderList(() => {
                     this.generateThumbsForDirectory(() => {
-                        this.updateFileList();
+                        this.updateFileList(() => { }, filters);
                     });
                 });
             });
@@ -168,8 +189,6 @@ class DirectoryView extends React.Component<{}, States> {
             }, cb);
         })
         .catch((error) => {
-            console.error(error);
-            
             this.setState({
                 error: true,
                 errorMessage: error.message,
@@ -238,5 +257,3 @@ class DirectoryView extends React.Component<{}, States> {
         );
     }
 }
-
-export default DirectoryView;

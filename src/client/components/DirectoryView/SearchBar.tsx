@@ -1,10 +1,11 @@
 import React from "react";
+import { useHistory } from "react-router-dom";
 
 import SearchIcon from "@mui/icons-material/Search";
 import { InputBase } from "@mui/material";
 import { alpha, styled } from "@mui/system";
 
-export const Search = styled("div")(({ theme }) => ({
+const Search = styled("div")(({ theme }) => ({
     position: "relative",
     borderRadius: theme.shape.borderRadius,
     backgroundColor: alpha(theme.palette.common.white, 0.15),
@@ -20,7 +21,7 @@ export const Search = styled("div")(({ theme }) => ({
     },
 }));
 
-export const SearchIconWrapper = styled("div")(({ theme }) => ({
+const SearchIconWrapper = styled("div")(({ theme }) => ({
     padding: theme.spacing(0, 2),
     height: "100%",
     position: "absolute",
@@ -30,7 +31,7 @@ export const SearchIconWrapper = styled("div")(({ theme }) => ({
     justifyContent: "center",
 }));
   
-export const StyledInputBase = styled(InputBase)(({ theme }) => ({
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
     color: "inherit",
     "& .MuiInputBase-input": {
         padding: theme.spacing(1, 1, 1, 0),
@@ -45,15 +46,26 @@ export const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-export default function SearchBar({ onSubmit }: { onSubmit: (query: string) => void }) {
-    const [ value, onChange ] = React.useState("");
-    const ref = React.useRef<HTMLInputElement>();
+function SearchBar({ onSubmit }: { onSubmit: (query: string) => void }) {
+    const hist = useHistory();
+    const ref = React.useRef();
 
-    function onKeyDown(event: React.KeyboardEvent) {
-        if (ref?.current && event.key === "Enter") {
-            onSubmit(value);
-        }
-    }
+    let restoredSearch = (hist.location.state as { [k: string]: any })?.searchQuery;
+
+    const [ value, onChange ] = React.useState(restoredSearch || "");
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/search_event
+    React.useEffect(() => {
+        // @ts-ignore
+        ref?.current && (ref.current.onsearch = (e) => {
+            onSubmit(e.target.value);
+            hist.push('/' + window.location.hash, {
+                ...(hist.location.state as { [k: string]: any } || {}),
+                searchQuery: e.target.value
+            });
+        });
+        // eslint-disable-next-line
+    }, []);
     
     return (
         <Search style={{ marginLeft: "12px" }}>
@@ -61,13 +73,15 @@ export default function SearchBar({ onSubmit }: { onSubmit: (query: string) => v
                 <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
-                ref={ref}
                 placeholder="Search in folder"
-                inputProps={{ "aria-label": "search" }}
+                type="search"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                onKeyDown={onKeyDown}
+                inputProps={{ "aria-label": "search" }}
+                ref={ref}
             />
         </Search>
     );
 }
+
+export default SearchBar;

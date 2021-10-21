@@ -1,10 +1,10 @@
 import React from "react";
-import { List, ListItem, ListItemIcon, ListItemText, Switch, SwipeableDrawer, ListItemSecondaryAction, ListSubheader, Link, SwipeableDrawerProps, AppBar, IconButton, Toolbar } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
-import MenuIcon from '@mui/icons-material/Menu';
-import NightsStayIcon from '@mui/icons-material/NightsStay';
-import WbSunnyIcon from '@mui/icons-material/WbSunny';
-import BackupIcon from '@mui/icons-material/Backup';
+import { List, ListItem, ListItemIcon, ListItemText, Switch, SwipeableDrawer, ListItemSecondaryAction, ListSubheader, Link, AppBar, IconButton, Toolbar } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import MenuIcon from "@mui/icons-material/Menu";
+import NightsStayIcon from "@mui/icons-material/NightsStay";
+import WbSunnyIcon from "@mui/icons-material/WbSunny";
+import BackupIcon from "@mui/icons-material/Backup";
 import SearchBar from "./SearchBar";
 import { getUserTheme, setUserTheme } from "../../utils/session";
 
@@ -81,30 +81,19 @@ export default function SwipeableDrawerDirectory(props: SwipeableDrawerDirectory
         </div>
     );
 
-    let drawerVariant: SwipeableDrawerProps["variant"];
-    let appBar = ( <></> );
-
-    if (drawerAlwaysVisible) {
-        drawerVariant = "permanent"
-    } else {
-        drawerVariant = "temporary";
-
-        appBar = (
-            <AppBar position="sticky" color="inherit">
-                <Toolbar>
-                    <IconButton color="inherit" onClick={toggleDrawer} edge="start">
-                        <MenuIcon /> 
-                    </IconButton>
-
-                    {searchBar}
-                </Toolbar>
-            </AppBar>
-        );
-    }
-
     return (
         <>
-            {appBar}
+            {!drawerAlwaysVisible && (
+                <AppBar position="sticky" color="inherit">
+                    <Toolbar>
+                        <IconButton color="inherit" onClick={toggleDrawer} edge="start">
+                            <MenuIcon /> 
+                        </IconButton>
+
+                        {searchBar}
+                    </Toolbar>
+                </AppBar>
+            )}
             
             <SwipeableDrawer
                 disableDiscovery={true}
@@ -112,7 +101,7 @@ export default function SwipeableDrawerDirectory(props: SwipeableDrawerDirectory
                 onClose={onClose}
                 onOpen={onOpen}
                 open={isOpen}
-                variant={drawerVariant}
+                variant={drawerAlwaysVisible ? "permanent" : "temporary"}
             >
                 {list}
             </SwipeableDrawer>
