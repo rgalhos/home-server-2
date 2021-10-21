@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Pagination, ImageList as ImageListBox, ImageListItem, ImageListItemBar, Link } from "@mui/material";
+import { useHistory } from "react-router";
 import IFileInfo from "../../../../common/interfaces/IFileInfo";
 import { isOnMobile } from "../../../utils/utils";
-import { useHistory } from "react-router";
 
 interface VideoListProps {
     path: string,
@@ -51,7 +51,7 @@ export default function VideoList(props: VideoListProps) {
 
     return (
         <Box id="video-list">
-            <ImageListBox cols={isOnMobile() ? 2 : 4} style={{ justifyContent: "space-between", margin: "0 2px" }}>
+            <ImageListBox cols={ isOnMobile() ? 2 : 4 } style={{ justifyContent: "space-between", margin: "0 2px" }}>
                 {thumbs}
             </ImageListBox>
 
@@ -64,12 +64,19 @@ export default function VideoList(props: VideoListProps) {
     );
 }
 
+let isVideoPlaying: null | HTMLVideoElement = null;
+
 function playVideo({ current: video }: { current: HTMLVideoElement | null }) {
+    if (video === isVideoPlaying)
+        return;
+    stopVideo({ current: isVideoPlaying as HTMLVideoElement });
+    isVideoPlaying = video;
     video?.play();
 }
 
 function stopVideo({ current: video }: { current: HTMLVideoElement | null }) {
     if (video) {
+        isVideoPlaying = null;
         video.pause();
         video.currentTime = 0;
     }
@@ -81,14 +88,16 @@ const VideoItem = ({ video }: { video: IFileInfo} ) => {
     return (
         <ImageListItem
             data-hash={video.hash}
-            onTouchStart={() => playVideo(ref) }
-            onTouchEnd={ () => stopVideo(ref) }
-            onMouseOver={ () => playVideo(ref) }
-            onMouseOut={ () => stopVideo(ref) }
+            {...(
+                isOnMobile()
+                ? { onTouchStart: () => playVideo(ref) }
+                : { onMouseOver: () => playVideo(ref), onMouseOut: () => stopVideo(ref) }
+            )}
         >
             <Link href={"/$preview/" + video.hash}>
                 <video
-                    loop
+                    //loop
+                    disablePictureInPicture
                     muted
                     ref={ref}
                     width="100%"
@@ -102,7 +111,7 @@ const VideoItem = ({ video }: { video: IFileInfo} ) => {
                     />
                 </video>
 
-                <ImageListItemBar
+                <ImageListItemBar              
                     title={ video.name.split('.').slice(0, -1).join('.') }
                 />
             </Link>

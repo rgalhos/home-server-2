@@ -1,5 +1,5 @@
 import React from "react";
-import { List, ListItem, ListItemIcon, ListItemText, Switch, SwipeableDrawer, ListItemSecondaryAction, ListSubheader, Link, AppBar, IconButton, Toolbar } from "@mui/material";
+import { Divider, List, ListItem, ListItemIcon, ListItemText, Switch, SwipeableDrawer, ListItemSecondaryAction, ListSubheader, Link, AppBar, IconButton, Toolbar } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MenuIcon from "@mui/icons-material/Menu";
 import NightsStayIcon from "@mui/icons-material/NightsStay";
@@ -48,7 +48,13 @@ export default function SwipeableDrawerDirectory(props: SwipeableDrawerDirectory
     const list = (
         <div role="presentation">
             <List>
-                { drawerAlwaysVisible && searchBar }
+                { drawerAlwaysVisible && (
+                    <>
+                        {searchBar}
+                        <ListItem></ListItem>
+                        <Divider />
+                    </>
+                ) }
 
                 <ListItem button component={Link} color="inherit" href="/$bin">
                     <ListItemIcon><DeleteIcon /></ListItemIcon>
